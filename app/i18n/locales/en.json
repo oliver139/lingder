@@ -10,6 +10,11 @@
         "light": "Switch to @:app.theme.name.light",
         "dark": "Switch to @:app.theme.name.dark"
       }
+    },
+    "navigation": {
+      "label": "Main navigation",
+      "cards": "Cards",
+      "table": "Table"
     }
   },
   "study": {
@@ -95,7 +100,7 @@
     }
   },
   "audioTest": {
-    "title": "Pronunciation test",
+    "title": "Pronunciation Table",
     "description": "Listen to every character, including historical kana. Playing another character stops the previous recording. Your study progress is unchanged.",
     "play": "Play {script} {character} pronunciation"
   }

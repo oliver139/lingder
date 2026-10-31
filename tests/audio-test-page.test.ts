@@ -4,7 +4,7 @@ import { defineComponent } from 'vue'
 import { usePronunciationAudio } from '@/composables/usePronunciationAudio'
 import { pronunciationByCard } from '@/data/audio'
 import { studyDecks } from '@/data/decks'
-import TestPage from '@/pages/test.vue'
+import TestPage from '@/pages/table.vue'
 
 const originalAudio = globalThis.Audio
 class FakeAudio extends EventTarget {

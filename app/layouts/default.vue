@@ -1,5 +1,7 @@
 <script setup lang="ts">
 const localePath = useLocalePath()
+const getRouteBaseName = useRouteBaseName()
+const route = useRoute()
 </script>
 
 <template>
@@ -27,14 +29,36 @@ const localePath = useLocalePath()
           </NuxtLink>
         </template>
         <template #right>
-          <div
-            class="
-              flex items-center gap-6 text-[0.7rem] text-muted
-              [&>span]:hidden
-              sm:[&>span]:inline
-            "
-          >
-            <span>{{ $t('study.smallSteps') }}</span><ThemeToggler />
+          <div class="flex items-center gap-1 sm:gap-4">
+            <nav
+              class="
+                flex items-center gap-1 text-xs font-medium
+                sm:text-sm
+              "
+              :aria-label="$t('app.navigation.label')"
+            >
+              <NuxtLink
+                v-for="link in [{ path: '/', name: 'index', label: 'cards' }, { path: '/table', name: 'table', label: 'table' }]"
+                :key="link.name"
+                v-slot="{ href, navigate }"
+                :to="localePath(link.path)"
+                custom
+              >
+                <a
+                  :href="href"
+                  class="
+                    flex min-h-11 items-center rounded-lg px-2
+                    text-muted
+                    hover:text-highlighted
+                    aria-[current=page]:text-primary
+                    sm:px-3
+                  "
+                  :aria-current="getRouteBaseName(route) === link.name ? 'page' : undefined"
+                  @click="navigate"
+                >{{ $t(`app.navigation.${link.label}`) }}</a>
+              </NuxtLink>
+            </nav>
+            <ThemeToggler />
           </div>
         </template>
       </UHeader>
