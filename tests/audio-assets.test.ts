@@ -26,7 +26,13 @@ describe('pronunciation assets and attribution', () => {
       expect(recording.modifications).toContain('MP3')
       expect(new URL(recording.sourceUrl).protocol).toBe('https:')
       expect(new URL(recording.licenseUrl).protocol).toBe('https:')
-      expect(recording.license).toBe(recording.mode === 'tw' ? 'CC BY 4.0' : 'Public domain')
+      expect(recording.license).toBe(['ja-wi', 'ja-we'].includes(recording.id) ? 'Public domain' : 'CC BY 4.0')
+      if (recording.mode === 'ja' && !['ja-wi', 'ja-we'].includes(recording.id)) {
+        expect(recording.author).toBe('FUN Japanese Learning')
+        expect(recording.sha256).toBe(recording.originalSha256)
+        expect(recording.downloadUrl).toMatch(/kana-trainer\/[a-f\d]{40}\/data\/audio\/seion\//)
+        expect(recording.modifications).toContain('copied unchanged')
+      }
       expect(data.length).toBeGreaterThan(1000)
       bytes += statSync(file).size
     }

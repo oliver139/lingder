@@ -96,7 +96,9 @@
       "creditsDescription": "Recording sources, authors, and licenses for Lingder pronunciation audio.",
       "processing": "Recordings have been trimmed, volume-normalized, peak-limited, and converted to mono MP3.",
       "recordings": "Recording details ({count})",
-      "source": "Original source"
+      "source": "Original source",
+      "japaneseCredit": "Modern kana recordings by FUN Japanese Learning, used under CC BY 4.0, via kana-trainer.",
+      "japaneseProcessing": "The 46 modern kana MP3s are used unchanged. Historical wi and we retain their public-domain Wikimedia recordings, with silence trimming, volume normalization, peak limiting, and MP3 conversion."
     }
   },
   "audioTest": {

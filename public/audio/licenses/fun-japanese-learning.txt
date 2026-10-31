@@ -1,0 +1,14 @@
+Modern Japanese kana audio: FUN Japanese Learning
+Licensed under Creative Commons Attribution 4.0 International (CC BY 4.0).
+License: https://creativecommons.org/licenses/by/4.0/
+Original publisher: https://funjapaneselearning.com/katakana-course-2/
+Distributed by: https://github.com/arsalan-anwari/kana-trainer
+Revision: 88cbdb0ae60b3bb821d4f0cd4961199990998521
+License evidence: https://github.com/arsalan-anwari/kana-trainer/blob/88cbdb0ae60b3bb821d4f0cd4961199990998521/README.md#credits
+Upstream credit: Character sounds from FUN Japanese Learning (CC BY 4.0).
+
+Lingder copies the 46 seion MP3 files unchanged. No additional audio processing.
+The license attribution is based on the distributor's published credit.
+This notice applies to the modern kana recordings only; historical wi/we retain
+separate Wikimedia Commons public-domain provenance. Application code licensing
+is separate from these audio licenses. Retain attribution when redistributing.
