@@ -82,6 +82,16 @@
     "storage": {
       "unavailable": "Your browser cannot save progress right now. You can keep studying, but changes may be lost when you leave.",
       "invalid": "Saved progress could not be read. A fresh session has been started."
+    },
+    "audio": {
+      "play": "Play pronunciation",
+      "revealFirst": "Reveal the reading to hear pronunciation",
+      "error": "Audio could not play. Tap the speaker to retry.",
+      "credits": "Audio credits",
+      "creditsDescription": "Recording sources, authors, and licenses for Lingder pronunciation audio.",
+      "processing": "Recordings have been trimmed, volume-normalized, peak-limited, and converted to mono MP3.",
+      "recordings": "Recording details ({count})",
+      "source": "Original source"
     }
   }
 }

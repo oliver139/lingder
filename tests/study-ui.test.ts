@@ -9,6 +9,7 @@ import StudyCard from '@/components/study/StudyCard.vue'
 import StudyComplete from '@/components/study/StudyComplete.vue'
 import StudySettings from '@/components/study/StudySettings.vue'
 import { useCardGesture } from '@/composables/useCardGesture'
+import { usePronunciationAudio } from '@/composables/usePronunciationAudio'
 import { useStudyPersistence } from '@/composables/useStudyPersistence'
 import en from '@/i18n/locales/en.json'
 import IndexPage from '@/pages/index.vue'
@@ -28,6 +29,7 @@ beforeEach(() => {
   vi.stubGlobal('useStudyStore', useStudyStore)
   vi.stubGlobal('useStudyPersistence', useStudyPersistence)
   vi.stubGlobal('useCardGesture', useCardGesture)
+  vi.stubGlobal('usePronunciationAudio', usePronunciationAudio)
   vi.stubGlobal('useI18n', () => ({ t }))
   vi.stubGlobal('useLocalePath', () => (path: string) => `/en${path}`)
 })

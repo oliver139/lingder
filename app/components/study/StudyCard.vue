@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Rating, StudyCard, StudyDeck } from '../../types/study'
+import { pronunciationByCard } from '../../data/audio'
 
 const props = defineProps<{
   card: StudyCard
@@ -13,6 +14,8 @@ const surface = shallowRef<HTMLElement | null>(null)
 let animation: Animation | undefined
 const revealed = shallowRef(false)
 const committed = shallowRef(false)
+const pronunciation = usePronunciationAudio()
+const recording = computed(() => pronunciationByCard[props.card.id])
 const cards = computed(() => [{ ...props.card, deck: props.deck }, ...(props.upcoming ?? []).slice(0, 2)].map((card, index) => ({
   ...card,
   showReading: props.readingDisplay === 'visible' || (index === 0 && revealed.value),
@@ -46,6 +49,7 @@ async function rate(rating: Rating, direction?: { x: number, y: number }) {
   if (committed.value) {
     return
   }
+  pronunciation.stop()
   committed.value = true
   emit('busy', true)
   const id = props.card.id
@@ -94,6 +98,7 @@ async function returnCard(exit?: { x: number, y: number }) {
     return
   }
   animation?.cancel()
+  pronunciation.stop()
   committed.value = true
   emit('busy', true)
   const bounds = stack.value.getBoundingClientRect()
@@ -124,6 +129,7 @@ async function returnCard(exit?: { x: number, y: number }) {
 }
 
 watch(() => props.card.id, async (id) => {
+  pronunciation.stop()
   const hadFocus = stack.value?.contains(document.activeElement)
   animation?.cancel()
   animation = undefined
@@ -131,7 +137,7 @@ watch(() => props.card.id, async (id) => {
   revealed.value = false
   await nextTick()
   if (hadFocus) {
-    surface.value?.focus()
+    surface.value?.querySelector<HTMLElement>('[data-card-surface]')?.focus()
   }
   const promotions = surface.value?.getAnimations?.() ?? []
   if (promotions.length) {
@@ -148,7 +154,12 @@ onBeforeUnmount(() => {
 })
 defineExpose({ rate, returnCard })
 
+watch(dragging, (value) => {
+  if (value) pronunciation.stop()
+}, { flush: 'sync' })
+
 watch(() => props.readingDisplay, () => {
+  pronunciation.stop()
   revealed.value = false
 })
 
@@ -195,45 +206,68 @@ function keydown(event: KeyboardEvent) {
         class="
           relative col-start-1 row-start-1 flex aspect-3/4
           w-full touch-none flex-col items-center rounded-[1.75rem]
-          border border-accented bg-card p-6 shadow-card
-          select-none
+          border border-accented bg-card shadow-card select-none
           motion-reduce:transition-none
         "
-        :class="[index === 0 ? 'study-card' : 'pointer-events-none', dragging && index === 0 ? 'cursor-grabbing transition-none' : 'cursor-grab transition-[transform,opacity] duration-240 ease-out']"
+        :class="[index === 0 ? '' : 'pointer-events-none', dragging && index === 0 ? 'cursor-grabbing transition-none' : 'cursor-grab transition-[transform,opacity] duration-240 ease-out']"
         :style="{ opacity: index === 0 ? opacity : 1, zIndex: cards.length - index, transform: index === 0 ? `translate(${offset.x}px, ${offset.y}px) rotate(${offset.x / 25}deg)` : `translateY(${index * 10}px) rotate(${index === 1 ? 4 : -4}deg) scale(${1 - index * 0.025})` }"
-        :role="index === 0 ? 'button' : undefined"
-        :tabindex="index === 0 ? 0 : -1"
         :inert="index !== 0"
         :aria-hidden="index !== 0 || undefined"
-        :aria-disabled="index === 0 ? committed : undefined"
-        :aria-label="$t('study.cardLabel', { script: $t(item.deck.labelKey), prompt: item.prompt })"
-        :aria-describedby="index === 0 ? 'card-help card-reading' : undefined"
-        @keydown="keydown"
         @click="index === 0 && !committed && !moved && (revealed = true)"
       >
         <div
           class="
-            flex w-full justify-between text-xs tracking-[0.06em]
-            text-muted
+            flex w-full flex-1 flex-col items-center
+            p-6
           "
+          :class="index === 0 ? 'study-card' : undefined"
+          data-card-surface
+          :role="index === 0 ? 'button' : undefined"
+          :tabindex="index === 0 ? 0 : -1"
+          :aria-disabled="index === 0 ? committed : undefined"
+          :aria-label="$t('study.cardLabel', { script: $t(item.deck.labelKey), prompt: item.prompt })"
+          :aria-describedby="index === 0 ? 'card-help card-reading' : undefined"
+          @keydown="keydown"
         >
-          <span>{{ $t(item.deck.labelKey) }}</span>
-          <span v-if="item.historical" class="text-primary">{{ $t('study.historicalBadge') }}</span>
-          <span v-else aria-hidden="true">✦</span>
-        </div>
-        <span class="card-character mt-auto block text-[clamp(5rem,20vw,7rem)] leading-[1.7]" :class="item.deck.fontFamily === 'kana' ? 'font-kana' : 'font-zhuyin'" :lang="item.deck.language">{{ item.prompt }}</span>
-        <span :id="index === 0 ? 'card-reading' : undefined" class="grid min-h-10 place-items-center" lang="en" aria-live="polite">
-          <span
+          <div
             class="
-              font-serif text-[1.6rem] transition-[filter] duration-250
-              motion-reduce:transition-none motion-reduce:duration-0
+              flex w-full justify-between text-xs tracking-[0.06em]
+              text-muted
             "
-            :class="item.showReading ? 'blur-none' : 'blur-[6px]'"
-            :aria-hidden="!item.showReading"
-          >{{ item.reading }}</span>
-          <span v-if="!item.showReading" class="sr-only">{{ $t('study.tapReveal') }}</span>
-        </span>
-        <span class="mt-auto pt-4 text-[0.7rem] text-muted">{{ $t(item.showReading ? 'study.takeYourTime' : 'study.revealHint') }}</span>
+          >
+            <span>{{ $t(item.deck.labelKey) }}</span>
+            <span v-if="item.historical" class="mr-10 text-primary">{{ $t('study.historicalBadge') }}</span>
+          </div>
+          <span class="card-character mt-auto block text-[clamp(5rem,20vw,7rem)] leading-[1.7]" :class="item.deck.fontFamily === 'kana' ? 'font-kana' : 'font-zhuyin'" :lang="item.deck.language">{{ item.prompt }}</span>
+          <span :id="index === 0 ? 'card-reading' : undefined" class="grid min-h-10 place-items-center" lang="en" aria-live="polite">
+            <span
+              class="
+                font-serif text-[1.6rem] transition-[filter] duration-250
+                motion-reduce:transition-none motion-reduce:duration-0
+              "
+              :class="item.showReading ? 'blur-none' : 'blur-[6px]'"
+              :aria-hidden="!item.showReading"
+            >{{ item.reading }}</span>
+            <span v-if="!item.showReading" class="sr-only">{{ $t('study.tapReveal') }}</span>
+          </span>
+          <span class="mt-auto pt-4 text-center text-[0.7rem] text-muted" :role="index === 0 && pronunciation.error.value ? 'alert' : undefined">{{ $t(index === 0 && pronunciation.error.value ? 'study.audio.error' : item.showReading ? 'study.takeYourTime' : 'study.revealHint') }}</span>
+        </div>
+        <UButton
+          v-if="index === 0 && recording"
+          class="
+            absolute top-4 right-4 min-h-11 min-w-11
+            justify-center rounded-full
+          "
+          color="primary"
+          variant="ghost"
+          :icon="pronunciation.loading.value ? 'i-lucide-loader-circle' : pronunciation.playing.value ? 'i-lucide-audio-lines' : 'i-lucide-volume-2'"
+          :ui="{ leadingIcon: pronunciation.loading.value ? 'animate-spin motion-reduce:animate-none' : undefined }"
+          :disabled="!item.showReading || committed"
+          :title="$t(item.showReading ? 'study.audio.play' : 'study.audio.revealFirst')"
+          @click.stop="pronunciation.play(recording.src)"
+          :aria-busy="pronunciation.loading.value"
+          :aria-label="$t(item.showReading ? 'study.audio.play' : 'study.audio.revealFirst')"
+        />
       </div>
     </TransitionGroup>
   </div>

@@ -42,7 +42,7 @@ const localePath = useLocalePath()
         <slot />
       </UMain>
       <UFooter :ui="{ container: 'flex justify-between gap-4 border-t border-default py-6 text-[0.65rem] text-muted max-sm:flex-col max-sm:gap-2 px-0 sm:px-0 lg:px-0', left: 'order-1 mt-0 justify-start lg:flex-none', center: 'hidden', right: 'order-3 justify-start lg:flex-none' }">
-        <template #left><span>{{ $t('study.footer') }}</span></template>
+        <template #left><div class="flex flex-wrap items-center gap-x-4 gap-y-2"><span>{{ $t('study.footer') }}</span><AudioCredits /></div></template>
         <template #right><span>{{ $t('study.localOnly') }}</span></template>
       </UFooter>
     </div>

@@ -124,6 +124,25 @@ describe('pronunciation playback', () => {
     expect(player.playing.value).toBe(false)
   })
 
+  it('invalidates an in-flight play promise after a media error', async () => {
+    const { player } = setup()
+    await player.play('/audio/ja/a.mp3')
+    await nextTick()
+    const audio = FakeAudio.instances[0]!
+    let resolve!: () => void
+    audio.play.mockImplementationOnce(() => new Promise<void>((done) => {
+      resolve = done
+    }))
+    const pending = player.play('/audio/ja/i.mp3')
+    audio.currentSrc = audio.src
+    audio.dispatchEvent(new Event('error'))
+    resolve()
+    await pending
+    expect(player.error.value).toBe(true)
+    expect(player.playing.value).toBe(false)
+    expect(player.loading.value).toBe(false)
+  })
+
   it('releases media and removes listeners on unmount', async () => {
     const { player, wrapper } = setup()
     await player.play('/audio/ja/a.mp3')

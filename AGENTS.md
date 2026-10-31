@@ -68,6 +68,7 @@ Only commit when the user explicitly asks; do not commit automatically. When com
 - Use Pinia for shared state and `useState` for small SSR-hydrated shared values. Never keep request-specific state in module-level mutable refs.
 - Prefer existing VueUse utilities and clean up listeners and effects. Guard browser APIs and preserve hydration safety.
 - Nuxt color mode owns theme state and persistence. Preserve the native fade and immediate reduced-motion fallback. Do not add production debug logs.
+- Pronunciation uses one lazily created native audio element per mounted card stack. Keep playback on demand, cancel it on card/gesture changes, and preserve the per-recording source/license manifest in `app/data/audio/`. Audio licensing is separate from the app MIT license.
 
 ## UI and localization
 

@@ -4,9 +4,11 @@ import { page, userEvent } from 'vitest/browser'
 import { defineComponent, nextTick, shallowRef } from 'vue'
 import StudyCard from '@/components/study/StudyCard.vue'
 import { useCardGesture } from '@/composables/useCardGesture'
+import { usePronunciationAudio } from '@/composables/usePronunciationAudio'
 import { studyDecks } from '@/data/decks'
 
 vi.stubGlobal('useCardGesture', useCardGesture)
+vi.stubGlobal('usePronunciationAudio', usePronunciationAudio)
 afterEach(() => vi.restoreAllMocks())
 
 async function setup() {
@@ -14,9 +16,9 @@ async function setup() {
   const deck = studyDecks[0]!
   const screen = await render(StudyCard, {
     props: { card: deck.cards[0]!, deck, readingDisplay: 'reveal', onRate: rate },
-    global: { mocks: { $t: (key: string) => key } },
+    global: { mocks: { $t: (key: string) => key }, components: { UButton: defineComponent({ props: ['disabled', 'loading'], template: '<button :disabled="disabled || loading"><slot /></button>' }) } },
   })
-  return { rate, screen, card: page.getByRole('button') }
+  return { rate, screen, card: page.getByRole('button', { name: 'study.cardLabel', exact: true }) }
 }
 
 function pointer(element: Element, type: string, x: number, y: number, id = 1) {
@@ -30,7 +32,7 @@ it.each([
   [0, 110, 'mastered'],
 ] as const)('rates a swipe (%i, %i) once as %s', async (x, y, rating) => {
   const { card, rate } = await setup()
-  const element = card.element()
+  const element = card.element().parentElement!
   // Synthetic pointers have no active browser capture; capture itself is exercised by real mouse below.
   vi.spyOn(element, 'setPointerCapture').mockImplementation(() => undefined)
   pointer(element, 'pointerdown', 150, 150)
@@ -42,7 +44,7 @@ it.each([
 
 it('returns short and cancelled drags without rating or revealing', async () => {
   const { card, rate } = await setup()
-  const element = card.element()
+  const element = card.element().parentElement!
   vi.spyOn(element, 'setPointerCapture').mockImplementation(() => undefined)
   pointer(element, 'pointerdown', 150, 150)
   pointer(element, 'pointermove', 170, 150)
@@ -93,7 +95,7 @@ it.each([
 
 it('ignores secondary pointers, lost capture, held keys and detached elements', async () => {
   const { card, rate, screen } = await setup()
-  const element = card.element()
+  const element = card.element().parentElement!
   vi.spyOn(element, 'setPointerCapture').mockImplementation(() => undefined)
   element.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, pointerId: 5, isPrimary: false, button: 0 }))
   pointer(element, 'pointerup', 150, 0, 5)
@@ -124,10 +126,10 @@ it('continues from the release position, fades offscreen, and promotes the exist
   const { screen, card, rate } = await setup()
   const deck = studyDecks[0]!
   await screen.rerender({ upcoming: deck.cards.slice(1, 3).map(card => ({ ...card, deck })) })
-  const element = card.element() as HTMLElement
+  const element = card.element().parentElement! as HTMLElement
   const next = document.querySelector(`[data-card-id="${deck.cards[1]!.id}"]`)!
   vi.spyOn(element, 'setPointerCapture').mockImplementation(() => undefined)
-  element.focus()
+  ;(card.element() as HTMLElement).focus()
   pointer(element, 'pointerdown', 150, 150)
   pointer(element, 'pointermove', 260, 170)
   pointer(element, 'pointerup', 260, 170)
@@ -155,7 +157,7 @@ it('continues from the release position, fades offscreen, and promotes the exist
   expect(Number(getComputedStyle(element).opacity)).toBe(0)
 
   await screen.rerender({ card: deck.cards[1]!, upcoming: deck.cards.slice(2, 4).map(card => ({ ...card, deck })) })
-  expect(card.element()).toBe(next)
+  expect(card.element().parentElement).toBe(next)
   await expect.element(card).toHaveFocus()
   expect(document.querySelector(`[data-card-id="${deck.cards[0]!.id}"]`)).toBeNull()
   expect(document.querySelector(`[data-card-id="${deck.cards[3]!.id}"]`)).not.toBeNull()
@@ -166,7 +168,7 @@ it('continues from the release position, fades offscreen, and promotes the exist
 it('cancels a pending rating when the deck changes', async () => {
   const { card, screen, rate } = await setup()
   card.element().dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }))
-  const animation = card.element().getAnimations()[0]!
+  const animation = card.element().parentElement!.getAnimations()[0]!
   animation.pause()
   const deck = studyDecks[2]!
   await screen.rerender({ card: deck.cards[0]!, deck })
@@ -181,7 +183,7 @@ it('rates immediately without animation when reduced motion is preferred', async
     const { card, rate } = await setup()
     card.element().dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }))
     expect(rate).toHaveBeenCalledExactlyOnceWith('ja-hiragana-a', 'mastered', undefined)
-    expect(card.element().getAnimations()).toHaveLength(0)
+    expect(card.element().parentElement!.getAnimations()).toHaveLength(0)
   } finally {
     media.mockRestore()
   }
@@ -189,7 +191,7 @@ it('rates immediately without animation when reduced motion is preferred', async
 
 it.each(['left', 'right', 'up', 'down'])('fades while dragging toward the %s edge and preserves transparency on release', async (direction) => {
   const { card, rate } = await setup()
-  const element = card.element() as HTMLElement
+  const element = card.element().parentElement! as HTMLElement
   vi.spyOn(element, 'setPointerCapture').mockImplementation(() => undefined)
   // Standalone tests do not load the app's Tailwind sizing utilities.
   element.style.height = '450px'
@@ -221,7 +223,7 @@ it.each(['left', 'right', 'up', 'down'])('fades while dragging toward the %s edg
 
 it('prevents native selection dragging from taking over a card swipe', async () => {
   const { card, rate } = await setup()
-  const element = card.element()
+  const element = card.element().parentElement!
   vi.spyOn(element, 'setPointerCapture').mockImplementation(() => undefined)
   const selection = window.getSelection()!
   selection.selectAllChildren(document.body)
@@ -264,14 +266,14 @@ it.each([
     },
     template: '<StudyCard v-if="index !== null" ref="stack" :card="deck.cards[index]" :deck="deck" :upcoming="deck.cards.slice(index + 1, index + 3).map(card => ({ ...card, deck }))" reading-display="visible" @busy="busy = $event" /><button :disabled="busy" @click="undo">Undo</button>',
   })
-  await render(fixture, { global: { mocks: { $t: (key: string) => key } } })
+  await render(fixture, { global: { mocks: { $t: (key: string) => key }, components: { UButton: defineComponent({ props: ['disabled', 'loading'], template: '<button :disabled="disabled || loading"><slot /></button>' }) } } })
   const next = document.querySelector(`[data-card-id="${deck.cards[1]!.id}"]`)
   await page.getByRole('button', { name: 'Undo', exact: true }).click()
   const restored = document.querySelector(`[data-card-id="${deck.cards[0]!.id}"]`) as HTMLElement
   const animation = restored.getAnimations().find(animation => animation.effect?.getTiming().duration === 300)!
   if (reduced) {
     expect(animation).toBeUndefined()
-    expect(restored.getAttribute('aria-disabled')).toBe('false')
+    expect(restored.querySelector('[data-card-surface]')!.getAttribute('aria-disabled')).toBe('false')
     expect(new DOMMatrix(getComputedStyle(restored).transform).m41).toBe(0)
     return
   }
@@ -279,7 +281,7 @@ it.each([
   animation.currentTime = 0
   expect(new DOMMatrix(getComputedStyle(restored).transform).m41).toBe(-1200)
   expect(Number(getComputedStyle(restored).opacity)).toBe(0)
-  expect(restored.getAttribute('aria-disabled')).toBe('true')
+  expect(restored.querySelector('[data-card-surface]')!.getAttribute('aria-disabled')).toBe('true')
   if (next) {
     expect(document.querySelector(`[data-card-id="${deck.cards[1]!.id}"]`)).toBe(next)
   }
@@ -289,4 +291,53 @@ it.each([
   await expect.element(page.getByRole('button', { name: 'Undo', exact: true })).toBeEnabled()
   expect(new DOMMatrix(getComputedStyle(restored).transform).m41).toBe(0)
   expect(Number(getComputedStyle(restored).opacity)).toBe(1)
+})
+
+it('enables pronunciation after reveal without capturing, revealing, or rating from the speaker', async () => {
+  const play = vi.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue()
+  vi.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(() => undefined)
+  vi.spyOn(HTMLMediaElement.prototype, 'load').mockImplementation(() => undefined)
+  const { card, rate } = await setup()
+  const wrapper = card.element().parentElement!
+  const capture = vi.spyOn(wrapper, 'setPointerCapture').mockImplementation(() => undefined)
+  await expect.element(page.getByRole('button', { name: 'study.audio.revealFirst' })).toBeDisabled()
+  expect(play).not.toHaveBeenCalled()
+  await card.click()
+  capture.mockClear()
+  const speaker = page.getByRole('button', { name: 'study.audio.play' })
+  expect(speaker.element().closest('[role="button"]')).toBeNull()
+  await speaker.click()
+  expect(play).toHaveBeenCalledTimes(1)
+  expect(capture).not.toHaveBeenCalled()
+  expect(rate).not.toHaveBeenCalled()
+  ;(speaker.element() as HTMLButtonElement).focus()
+  await userEvent.keyboard('{Enter}')
+  expect(play).toHaveBeenCalledTimes(2)
+  expect(rate).not.toHaveBeenCalled()
+})
+
+it('stops audio when dragging or hiding the reading, and when the card changes', async () => {
+  vi.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue()
+  const pause = vi.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(() => undefined)
+  vi.spyOn(HTMLMediaElement.prototype, 'load').mockImplementation(() => undefined)
+  const { card, screen } = await setup()
+  await screen.rerender({ readingDisplay: 'visible' })
+  const speaker = page.getByRole('button', { name: 'study.audio.play' })
+  await speaker.click()
+  const wrapper = card.element().parentElement!
+  vi.spyOn(wrapper, 'setPointerCapture').mockImplementation(() => undefined)
+  pause.mockClear()
+  pointer(wrapper, 'pointerdown', 150, 150)
+  expect(pause).toHaveBeenCalledOnce()
+  pointer(wrapper, 'pointercancel', 150, 150)
+  await speaker.click()
+  pause.mockClear()
+  await screen.rerender({ readingDisplay: 'reveal' })
+  expect(pause).toHaveBeenCalled()
+  await expect.element(page.getByRole('button', { name: 'study.audio.revealFirst' })).toBeDisabled()
+  await screen.rerender({ readingDisplay: 'visible' })
+  await speaker.click()
+  pause.mockClear()
+  await screen.rerender({ card: studyDecks[0]!.cards[1]! })
+  expect(pause).toHaveBeenCalled()
 })

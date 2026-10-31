@@ -19,7 +19,7 @@ export function useCardGesture(target: Readonly<ShallowRef<HTMLElement | null>>,
   useEventListener(target, 'dragstart', event => event.preventDefault())
 
   useEventListener(target, 'pointerdown', (event) => {
-    if (disabled() || !event.isPrimary || event.button !== 0 || pointer !== null) {
+    if ((event.target instanceof Element && event.target.closest('button, a, input, select, textarea')) || disabled() || !event.isPrimary || event.button !== 0 || pointer !== null) {
       return
     }
     pointer = event.pointerId
