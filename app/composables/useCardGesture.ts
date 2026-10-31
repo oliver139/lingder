@@ -1,7 +1,7 @@
 import type { ShallowRef } from 'vue'
 import type { Rating } from '../types/study'
 
-export function useCardGesture(target: Readonly<ShallowRef<HTMLElement | null>>, rate: (rating: Rating) => void) {
+export function useCardGesture(target: Readonly<ShallowRef<HTMLElement | null>>, rate: (rating: Rating) => void, disabled: () => boolean = () => false) {
   const offset = shallowRef({ x: 0, y: 0 })
   const dragging = shallowRef(false)
   const moved = shallowRef(false)
@@ -15,7 +15,7 @@ export function useCardGesture(target: Readonly<ShallowRef<HTMLElement | null>>,
   }
 
   useEventListener(target, 'pointerdown', (event) => {
-    if (!event.isPrimary || event.button !== 0 || pointer !== null) {
+    if (disabled() || !event.isPrimary || event.button !== 0 || pointer !== null) {
       return
     }
     pointer = event.pointerId
@@ -40,10 +40,14 @@ export function useCardGesture(target: Readonly<ShallowRef<HTMLElement | null>>,
     const x = event.clientX - start.x
     const y = event.clientY - start.y
     const distance = Math.max(Math.abs(x), Math.abs(y))
-    cancel()
+    pointer = null
+    dragging.value = false
     if (distance >= 70) {
+      offset.value = { x, y }
       moved.value = true
       rate(Math.abs(x) >= Math.abs(y) ? 'review' : 'mastered')
+    } else {
+      cancel()
     }
   })
   useEventListener(target, ['pointercancel', 'lostpointercapture'], (event) => {

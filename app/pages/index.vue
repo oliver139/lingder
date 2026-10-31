@@ -1,11 +1,17 @@
 <script setup lang="ts">
 import type { Rating } from '../types/study'
+import { studyDecks } from '../data/decks'
 import { eligibleIds } from '../utils/study/session'
 
 const store = useStudyStore()
 const { storageWarning } = useStudyPersistence()
 const { t } = useI18n()
 const announcement = shallowRef('')
+const cardStack = useTemplateRef('cardStack')
+const animating = shallowRef(false)
+const upcoming = computed(() => store.progress.session.queue.slice(1, 3).flatMap(id =>
+  studyDecks.flatMap(deck => deck.cards.filter(card => card.id === id).map(card => ({ ...card, deck }))),
+))
 const stage = useTemplateRef<HTMLElement>('stage')
 const session = computed(() => store.progress.session)
 const exhausted = computed(() => eligibleIds(store.saved.mode, store.progress).length === 0)
@@ -27,7 +33,7 @@ function rate(id: string, rating: Rating) {
 
 function rateCurrent(rating: Rating) {
   if (store.current) {
-    rate(store.current.id, rating)
+    cardStack.value?.rate(rating)
   }
 }
 
@@ -116,14 +122,17 @@ function undo() {
           <div class="mb-4 flex justify-between text-[0.7rem] text-muted"><span>{{ $t(session.extra ? 'study.extraPractice' : 'study.dailySession') }}</span><span>{{ $t('study.remaining', { count: session.queue.length }) }}</span></div>
           <StudyCard
             v-if="store.current"
+            ref="cardStack"
+            :upcoming="upcoming"
             :card="store.current"
             :deck="store.current.deck"
             :reading-display="store.progress.settings.reading"
             @rate="rate"
+            @busy="animating = $event"
           />
           <StudyComplete v-else :exhausted="exhausted" :extra="session.extra" @practice="store.startExtra" />
           <p id="card-help" class="mt-7 mb-4 text-center text-xs text-muted">{{ $t('study.gestureHint') }}</p>
-          <RatingControls :disabled="!store.current" :can-undo="canUndo" @rate="rateCurrent" @undo="undo" />
+          <RatingControls :disabled="!store.current || animating" :can-undo="canUndo && !animating" @rate="rateCurrent" @undo="undo" />
           <p class="mt-2 text-center text-[0.65rem] leading-[1.7] text-muted">{{ $t('study.keyboardHint') }}</p>
           <p class="sr-only" role="status" aria-live="polite" aria-atomic="true">{{ announcement }} {{ $t('study.progressAnnouncement', { count: session.completed.length, goal: store.progress.settings.goal, percent: dailyPercent }) }}</p>
         </section>

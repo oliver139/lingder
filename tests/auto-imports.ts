@@ -3,8 +3,8 @@
 import { useEventListener, useIntervalFn } from '@vueuse/core'
 import { defineStore } from 'pinia'
 import { vi } from 'vitest'
-import { computed, nextTick, onMounted, ref, shallowRef, useTemplateRef, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, useTemplateRef, watch } from 'vue'
 
-for (const [name, value] of Object.entries({ defineStore, ref, shallowRef, computed, watch, onMounted, nextTick, useTemplateRef, useEventListener, useIntervalFn })) {
+for (const [name, value] of Object.entries({ defineStore, ref, shallowRef, computed, watch, onBeforeUnmount, onMounted, nextTick, useTemplateRef, useEventListener, useIntervalFn })) {
   vi.stubGlobal(name, value)
 }

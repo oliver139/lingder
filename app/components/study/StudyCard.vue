@@ -4,44 +4,99 @@ import type { Rating, StudyCard, StudyDeck } from '../../types/study'
 const props = defineProps<{
   card: StudyCard
   deck: StudyDeck
+  upcoming?: (StudyCard & { deck: StudyDeck })[]
   readingDisplay: 'visible' | 'reveal'
 }>()
-const emit = defineEmits<{ rate: [id: string, rating: Rating] }>()
-const surface = useTemplateRef<HTMLElement>('surface')
+const emit = defineEmits<{ rate: [id: string, rating: Rating], busy: [value: boolean] }>()
+const stack = useTemplateRef<HTMLElement>('stack')
+const surface = shallowRef<HTMLElement | null>(null)
+let animation: Animation | undefined
 const revealed = shallowRef(false)
 const committed = shallowRef(false)
-const showReading = computed(() => props.readingDisplay === 'visible' || revealed.value)
+const cards = computed(() => [{ ...props.card, deck: props.deck }, ...(props.upcoming ?? []).slice(0, 2)].map((card, index) => ({
+  ...card,
+  showReading: props.readingDisplay === 'visible' || (index === 0 && revealed.value),
+})))
 
-function rate(rating: Rating) {
+const { offset, dragging, moved, cancel } = useCardGesture(surface, rate, () => committed.value)
+
+async function rate(rating: Rating, direction?: { x: number, y: number }) {
   if (committed.value) {
     return
   }
   committed.value = true
-  emit('rate', props.card.id, rating)
+  emit('busy', true)
+  const id = props.card.id
+  const element = surface.value
+  if (element?.animate && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const origin = { ...offset.value }
+    const vector = direction ?? (Math.hypot(origin.x, origin.y) ? origin : rating === 'review' ? { x: 1, y: 0 } : { x: 0, y: -1 })
+    const length = Math.hypot(vector.x, vector.y)
+    const bounds = element.getBoundingClientRect()
+    const margin = Math.hypot(element.offsetWidth, element.offsetHeight) / 2
+    // Continue to the first viewport edge along the swipe, allowing for rotation.
+    const horizontal = vector.x === 0 ? Infinity : (vector.x > 0 ? window.innerWidth - bounds.left + margin : bounds.right + margin) * length / Math.abs(vector.x)
+    const vertical = vector.y === 0 ? Infinity : (vector.y > 0 ? window.innerHeight - bounds.top + margin : bounds.bottom + margin) * length / Math.abs(vector.y)
+    const distance = Math.max(0, Math.min(horizontal, vertical))
+    const x = origin.x + vector.x / length * distance
+    const y = origin.y + vector.y / length * distance
+    const transform = `translate(${x}px, ${y}px) rotate(${Math.sign(x) * 24}deg)`
+    animation = element.animate([
+      { transform: `translate(${origin.x}px, ${origin.y}px) rotate(${origin.x / 25}deg)`, opacity: 1 },
+      { opacity: 1, offset: 0.35 },
+      { transform, opacity: 0 },
+    ], { duration: 360, easing: 'linear', fill: 'forwards' })
+    try {
+      await animation.finished
+    } catch {
+      return
+    }
+  }
+  if (props.card.id === id) {
+    emit('rate', id, rating)
+  }
 }
 
-const { offset, dragging, moved, cancel } = useCardGesture(surface, rate)
-
-watch(() => props.card.id, () => {
+watch(() => props.card.id, async (id) => {
+  const hadFocus = stack.value?.contains(document.activeElement)
+  animation?.cancel()
+  animation = undefined
   cancel()
   revealed.value = false
-  committed.value = false
+  await nextTick()
+  if (hadFocus) {
+    surface.value?.focus()
+  }
+  const promotions = surface.value?.getAnimations?.() ?? []
+  if (promotions.length) {
+    await Promise.allSettled(promotions.map(animation => animation.finished))
+  }
+  if (props.card.id === id) {
+    committed.value = false
+    emit('busy', false)
+  }
 })
+onBeforeUnmount(() => {
+  animation?.cancel()
+  emit('busy', false)
+})
+defineExpose({ rate })
+
 watch(() => props.readingDisplay, () => {
   revealed.value = false
 })
 
 function keydown(event: KeyboardEvent) {
-  if (event.repeat || event.altKey || event.ctrlKey || event.metaKey) {
+  if (committed.value || event.repeat || event.altKey || event.ctrlKey || event.metaKey) {
     return
   }
   if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', ' ', 'Enter'].includes(event.key)) {
     event.preventDefault()
   }
   if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
-    rate('review')
+    rate('review', { x: event.key === 'ArrowLeft' ? -1 : 1, y: 0 })
   } else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
-    rate('mastered')
+    rate('mastered', { x: 0, y: event.key === 'ArrowUp' ? -1 : 1 })
   } else if (event.key === ' ' || event.key === 'Enter') {
     revealed.value = true
   }
@@ -49,53 +104,62 @@ function keydown(event: KeyboardEvent) {
 </script>
 
 <template>
-  <div class="relative mx-auto w-full max-w-100">
-    <div
-      class="
-        absolute inset-0 transform-[rotate(-4deg)_translateY(10px)] rounded-[1.75rem] border
-        border-accented bg-stack opacity-60
-      "
-      aria-hidden="true"
-    />
-    <div
-      class="
-        absolute inset-0 transform-[rotate(4deg)_translateY(7px)] rounded-[1.75rem] border
-        border-accented bg-stack
-      "
-      aria-hidden="true"
-    />
-    <div
-      ref="surface"
-      class="
-        study-card relative flex min-h-85 touch-none
-        flex-col items-center rounded-[1.75rem] border border-accented
-        bg-card p-6 shadow-card select-none
-        motion-reduce:transition-none
-        max-[480px]:min-h-75
-      "
-      :class="dragging ? 'cursor-grabbing transition-none' : 'cursor-grab transition-transform duration-180 ease-out'"
-      :style="{ transform: `translate(${offset.x}px, ${offset.y}px) rotate(${offset.x / 25}deg)` }"
-      role="button"
-      tabindex="0"
-      :aria-label="$t('study.cardLabel', { script: $t(deck.labelKey), prompt: card.prompt })"
-      aria-describedby="card-help card-reading"
-      @keydown="keydown"
-      @click="!moved && (revealed = true)"
+  <div
+    ref="stack"
+    class="
+      relative isolate z-10 mx-auto w-full
+      max-w-100
+    "
+  >
+    <TransitionGroup
+      tag="div"
+      class="grid"
+      enter-active-class="delay-200"
+      enter-from-class="opacity-0"
+      enter-to-class="opacity-100"
+      @leave="(_element, done) => done()"
     >
       <div
+        v-for="(item, index) in cards"
+        :key="item.id"
+        :ref="element => {
+          if (index === 0) surface = element as HTMLElement | null
+        }"
+        :data-card-id="item.id"
         class="
-          flex w-full justify-between text-xs tracking-[0.06em]
-          text-muted
+          relative col-start-1 row-start-1 flex min-h-85
+          touch-none flex-col items-center rounded-[1.75rem] border
+          border-accented bg-card p-6 shadow-card select-none
+          motion-reduce:transition-none
+          max-[480px]:min-h-75
         "
+        :class="[index === 0 ? 'study-card' : 'pointer-events-none', dragging && index === 0 ? 'cursor-grabbing transition-none' : 'cursor-grab transition-[transform,opacity] duration-240 ease-out']"
+        :style="{ zIndex: cards.length - index, transform: index === 0 ? `translate(${offset.x}px, ${offset.y}px) rotate(${offset.x / 25}deg)` : `translateY(${index * 10}px) rotate(${index === 1 ? 4 : -4}deg) scale(${1 - index * 0.025})` }"
+        :role="index === 0 ? 'button' : undefined"
+        :tabindex="index === 0 ? 0 : -1"
+        :inert="index !== 0"
+        :aria-hidden="index !== 0 || undefined"
+        :aria-disabled="index === 0 ? committed : undefined"
+        :aria-label="$t('study.cardLabel', { script: $t(item.deck.labelKey), prompt: item.prompt })"
+        :aria-describedby="index === 0 ? 'card-help card-reading' : undefined"
+        @keydown="keydown"
+        @click="index === 0 && !committed && !moved && (revealed = true)"
       >
-        <span>{{ $t(deck.labelKey) }}</span>
-        <span v-if="card.historical" class="text-primary">{{ $t('study.historicalBadge') }}</span>
-        <span v-else aria-hidden="true">✦</span>
+        <div
+          class="
+            flex w-full justify-between text-xs tracking-[0.06em]
+            text-muted
+          "
+        >
+          <span>{{ $t(item.deck.labelKey) }}</span>
+          <span v-if="item.historical" class="text-primary">{{ $t('study.historicalBadge') }}</span>
+          <span v-else aria-hidden="true">✦</span>
+        </div>
+        <span class="card-character block text-[clamp(5rem,20vw,7rem)] leading-[1.7]" :class="item.deck.fontFamily === 'kana' ? 'font-kana' : 'font-zhuyin'" :lang="item.deck.language">{{ item.prompt }}</span>
+        <span :id="index === 0 ? 'card-reading' : undefined" :class="item.showReading ? 'font-serif text-[1.6rem]' : 'my-1.5 text-base text-primary'" lang="en" aria-live="polite">{{ item.showReading ? item.reading : $t('study.tapReveal') }}</span>
+        <span class="mt-auto pt-4 text-[0.7rem] text-muted">{{ $t(item.showReading ? 'study.takeYourTime' : 'study.revealHint') }}</span>
       </div>
-      <span class="card-character block text-[clamp(5rem,20vw,7rem)] leading-[1.7]" :class="deck.fontFamily === 'kana' ? 'font-kana' : 'font-zhuyin'" :lang="deck.language">{{ card.prompt }}</span>
-      <span id="card-reading" :class="showReading ? 'font-serif text-[1.6rem]' : 'my-1.5 text-base text-primary'" lang="en" aria-live="polite">{{ showReading ? card.reading : $t('study.tapReveal') }}</span>
-      <span class="mt-auto pt-4 text-[0.7rem] text-muted">{{ $t(showReading ? 'study.takeYourTime' : 'study.revealHint') }}</span>
-    </div>
+    </TransitionGroup>
   </div>
 </template>
 

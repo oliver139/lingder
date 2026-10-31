@@ -36,7 +36,7 @@ it.each([
   pointer(element, 'pointermove', 150 + x, 150 + y)
   pointer(element, 'pointerup', 150 + x, 150 + y)
   pointer(element, 'pointerup', 150 + x, 150 + y)
-  expect(rate).toHaveBeenCalledExactlyOnceWith('ja-hiragana-a', rating)
+  await expect.poll(() => rate.mock.calls).toEqual([['ja-hiragana-a', rating]])
 })
 
 it('returns short and cancelled drags without rating or revealing', async () => {
@@ -63,7 +63,7 @@ it('supports focus, Space/Enter reveal, arrow keys and prevents held-key duplica
   await expect.element(page.getByText('a', { exact: true })).toBeVisible()
   await userEvent.keyboard('{ArrowRight}')
   await userEvent.keyboard('{ArrowUp}')
-  expect(rate).toHaveBeenCalledExactlyOnceWith('ja-hiragana-a', 'review')
+  await expect.poll(() => rate.mock.calls).toEqual([['ja-hiragana-a', 'review']])
 })
 
 it('reveals with a real pointer click and resets reading for the next card', async () => {
@@ -85,7 +85,7 @@ it.each([
   const { card, rate } = await setup()
   await card.click()
   await userEvent.keyboard(`{${key}}`)
-  expect(rate).toHaveBeenCalledExactlyOnceWith('ja-hiragana-a', rating)
+  await expect.poll(() => rate.mock.calls).toEqual([['ja-hiragana-a', rating]])
   await expect.element(card).toHaveFocus()
 })
 
@@ -112,4 +112,70 @@ it('exposes the revealed reading as an accessible description', async () => {
   await expect.element(card).toHaveAccessibleDescription('study.tapReveal')
   await card.click()
   await expect.element(card).toHaveAccessibleDescription('a')
+})
+
+it('continues from the release position, fades offscreen, and promotes the existing next card', async () => {
+  const { screen, card, rate } = await setup()
+  const deck = studyDecks[0]!
+  await screen.rerender({ upcoming: deck.cards.slice(1, 3).map(card => ({ ...card, deck })) })
+  const element = card.element() as HTMLElement
+  const next = document.querySelector(`[data-card-id="${deck.cards[1]!.id}"]`)!
+  vi.spyOn(element, 'setPointerCapture').mockImplementation(() => undefined)
+  element.focus()
+  pointer(element, 'pointerdown', 150, 150)
+  pointer(element, 'pointermove', 260, 170)
+  pointer(element, 'pointerup', 260, 170)
+  const animation = element.getAnimations()[0]!
+  animation.pause()
+  animation.currentTime = 0
+  expect(rate).not.toHaveBeenCalled()
+  const frames = (animation.effect as KeyframeEffect).getKeyframes()
+  expect(frames[0]!.transform).toBe('translate(110px, 20px) rotate(4.4deg)')
+  animation.currentTime = 36
+  const earlyTransform = new DOMMatrix(getComputedStyle(element).transform)
+  const exitX = Number(/translate\(([^p]+)px/.exec(String(frames.at(-1)!.transform))![1])
+  // The first tenth of the exit travels a tenth of the distance: no ease-in pause.
+  expect(earlyTransform.m41 - 110).toBeCloseTo((exitX - 110) * 0.1, 2)
+  animation.currentTime = 300
+  expect(Number(getComputedStyle(element).opacity)).toBeLessThan(1)
+  pointer(element, 'pointerdown', 150, 150)
+  pointer(element, 'pointerup', 150, 280)
+  expect(rate).not.toHaveBeenCalled()
+  animation.finish()
+  await expect.poll(() => rate.mock.calls).toEqual([['ja-hiragana-a', 'review']])
+  const finalTransform = new DOMMatrix(getComputedStyle(element).transform)
+  expect(finalTransform.m41).toBeGreaterThan(window.innerWidth)
+  expect(Number(getComputedStyle(element).opacity)).toBe(0)
+
+  await screen.rerender({ card: deck.cards[1]!, upcoming: deck.cards.slice(2, 4).map(card => ({ ...card, deck })) })
+  expect(card.element()).toBe(next)
+  await expect.element(card).toHaveFocus()
+  expect(document.querySelector(`[data-card-id="${deck.cards[0]!.id}"]`)).toBeNull()
+  expect(document.querySelector(`[data-card-id="${deck.cards[3]!.id}"]`)).not.toBeNull()
+  expect(document.querySelectorAll('[data-card-id]')).toHaveLength(3)
+  expect(card.element().getAttribute('aria-describedby')).toBe('card-help card-reading')
+})
+
+it('cancels a pending rating when the deck changes', async () => {
+  const { card, screen, rate } = await setup()
+  card.element().dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }))
+  const animation = card.element().getAnimations()[0]!
+  animation.pause()
+  const deck = studyDecks[2]!
+  await screen.rerender({ card: deck.cards[0]!, deck })
+  expect(animation.playState).toBe('idle')
+  expect(rate).not.toHaveBeenCalled()
+  expect(card.element().getAttribute('aria-disabled')).toBe('false')
+})
+
+it('rates immediately without animation when reduced motion is preferred', async () => {
+  const media = vi.spyOn(window, 'matchMedia').mockReturnValue({ matches: true } as MediaQueryList)
+  try {
+    const { card, rate } = await setup()
+    card.element().dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }))
+    expect(rate).toHaveBeenCalledExactlyOnceWith('ja-hiragana-a', 'mastered')
+    expect(card.element().getAnimations()).toHaveLength(0)
+  } finally {
+    media.mockRestore()
+  }
 })
