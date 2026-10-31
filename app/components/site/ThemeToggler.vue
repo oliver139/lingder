@@ -8,7 +8,7 @@ onMounted(() => {
 <template>
   <UButton
     color="primary"
-    class="size-10 p-0"
+    class="size-10 justify-center p-0"
     variant="ghost"
     :disabled="!mounted || $colorMode.unknown"
     :aria-label="!mounted || $colorMode.unknown ? $t('app.theme.switch.theme') : $colorMode.value === 'dark' ? $t('app.theme.switch.light') : $t('app.theme.switch.dark')"
