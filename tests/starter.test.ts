@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { defineComponent } from 'vue'
 import DefaultLayout from '@/layouts/default.vue'
 
+vi.stubGlobal('useI18n', () => ({ locale: 'en', locales: [{ code: 'en', name: 'English' }, { code: 'zh', name: '繁體中文' }, { code: 'ja', name: '日本語' }], setLocale: vi.fn() }))
 vi.stubGlobal('useRoute', () => ({ name: 'index___en' }))
 vi.stubGlobal('useRouteBaseName', () => () => 'index')
 
@@ -18,6 +19,7 @@ describe('starter', () => {
           NuxtLinkLocale: true,
           ThemeToggler: true,
           AudioCredits: true,
+          USelect: true,
         },
       },
       slots: {

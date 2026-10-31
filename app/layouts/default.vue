@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const getRouteBaseName = useRouteBaseName()
 const route = useRoute()
+const { locale, locales, setLocale } = useI18n()
 </script>
 
 <template>
@@ -57,6 +58,25 @@ const route = useRoute()
                 >{{ $t(`app.navigation.${link.label}`) }}</a>
               </NuxtLinkLocale>
             </nav>
+            <USelect
+              :model-value="locale"
+              :items="locales"
+              label-key="name"
+              value-key="code"
+              icon="i-lucide-languages"
+              color="primary"
+              variant="ghost"
+              :content="{ align: 'end' }"
+              class="
+                size-10 cursor-pointer justify-center p-0 text-primary
+                hover:bg-primary/10
+                focus:bg-transparent
+                active:bg-primary/10
+              "
+              :ui="{ leading: 'inset-0 justify-center p-0', leadingIcon: 'text-primary', value: 'sr-only', trailing: 'hidden', content: 'min-w-36' }"
+              :aria-label="$t('app.language')"
+              @update:model-value="setLocale($event)"
+            />
             <ThemeToggler />
           </div>
         </template>
