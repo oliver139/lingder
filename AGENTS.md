@@ -72,6 +72,7 @@ Only commit when the user explicitly asks; do not commit automatically. When com
 ## UI and localization
 
 - Keep the root `UApp` provider and its Nuxt UI locale synchronized with the active i18n locale.
+- Prefer Tailwind utilities and Nuxt UI component slots for layout and presentation; avoid custom CSS selectors and scoped style rules. Keep CSS for theme tokens, font configuration, and View Transition pseudo-elements.
 - Use supported Nuxt UI APIs and Tailwind 4's CSS-first setup. Inspect installed types and generated themes as reference; do not edit generated files.
 - Support keyboard navigation, visible focus, accessible names, light/dark mode, and reduced motion where relevant. Follow the approved lavender-and-ink visual direction.
 - Use only the installed `bx`, `lucide`, and `ri` icon collections. Ask the user for confirmation before adding another icon pack.

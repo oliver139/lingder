@@ -46,7 +46,7 @@ Audio, vocabulary decks, accounts, translations, and landscape mobile/tablet opt
 | `app/composables/` | Persistence/calendar lifecycle and Pointer Events |
 | `app/components/study/` | Card, controls, settings, collection, mode selector, completion |
 | `app/pages/index.vue` | Study-screen composition and status announcements |
-| `app/assets/css/main.css` | Theme, fonts, responsive layout, reduced motion |
+| `app/assets/css/main.css` | Tailwind theme tokens, fonts, and View Transition styles |
 | `app/i18n/locales/en.json` | Interface copy |
 
 The root `UApp` stays synchronized with the active locale; reactive locale metadata and `prefix_and_default` routing are preserved. Nuxt Content remains disabled. Dependency and package trust policies are unchanged.

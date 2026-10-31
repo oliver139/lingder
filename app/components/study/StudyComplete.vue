@@ -4,17 +4,21 @@ const emit = defineEmits<{ practice: [] }>()
 </script>
 
 <template>
-  <section class="completion" role="status" tabindex="-1">
-    <span class="completion-mark" aria-hidden="true">✦</span>
-    <h2>{{ $t(exhausted ? 'study.exhaustedTitle' : extra ? 'study.extraComplete' : 'study.completeTitle') }}</h2>
-    <p>{{ $t(exhausted ? 'study.exhaustedHint' : 'study.completeHint') }}</p>
+  <section
+    class="
+      completion flex min-h-85 flex-col items-center
+      justify-center gap-5 rounded-[1.75rem] border border-default
+      bg-card p-8 text-center
+    "
+    role="status"
+    tabindex="-1"
+  >
+    <span class="text-5xl text-primary" aria-hidden="true">✦</span>
+    <h2 class="text-2xl tracking-[-0.04em]">{{ $t(exhausted ? 'study.exhaustedTitle' : extra ? 'study.extraComplete' : 'study.completeTitle') }}</h2>
+    <p class="text-sm leading-[1.7] text-muted">{{ $t(exhausted ? 'study.exhaustedHint' : 'study.completeHint') }}</p>
     <UButton v-if="!exhausted" size="xl" icon="i-lucide-plus" @click="emit('practice')">{{ $t('study.extraPractice') }}</UButton>
   </section>
 </template>
 
 <style scoped>
-.completion { display: flex; min-height: 340px; padding: 2rem; flex-direction: column; align-items: center; justify-content: center; gap: 1.2rem; text-align: center; border: 1px solid var(--ui-border); border-radius: 1.75rem; background: var(--study-card); }
-.completion-mark { font-size: 3rem; color: var(--ui-primary); }
-h2 { font-size: 1.5rem; letter-spacing: -.04em; }
-p { font-size: .85rem; color: var(--ui-text-muted); line-height: 1.7; }
 </style>

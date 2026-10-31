@@ -8,14 +8,14 @@ const cards = computed(() => studyDecks.filter(deck => deck.mode === props.mode)
 </script>
 
 <template>
-  <details class="study-panel">
-    <summary>{{ $t('study.collection') }} <span class="collection-count">{{ mastered.length }}</span></summary>
-    <p class="panel-note collection-intro">{{ $t('study.collectionHint') }}</p>
-    <p v-if="!cards.length" class="panel-note">{{ $t('study.collectionEmpty') }}</p>
-    <ul v-else class="mastered-list">
-      <li v-for="card in cards" :key="card.id">
-        <span class="mastered-character" :class="card.deck.fontFamily" :lang="card.deck.language">{{ card.prompt }}</span>
-        <span class="mastered-reading">{{ card.reading }}<small>{{ $t(card.deck.labelKey) }}</small></span>
+  <details class="rounded-[1rem] border border-default bg-card p-5">
+    <summary class="cursor-pointer text-sm font-medium">{{ $t('study.collection') }} <span class="float-right text-primary">{{ mastered.length }}</span></summary>
+    <p class="mt-5 mb-3 text-[0.7rem] leading-[1.7] text-muted">{{ $t('study.collectionHint') }}</p>
+    <p v-if="!cards.length" class="text-[0.7rem] leading-[1.7] text-muted">{{ $t('study.collectionEmpty') }}</p>
+    <ul v-else class="grid max-h-90 gap-3 overflow-y-auto p-1">
+      <li v-for="card in cards" :key="card.id" class="flex items-center gap-3">
+        <span class="text-[2rem]" :class="card.deck.fontFamily === 'kana' ? 'font-kana' : 'font-zhuyin'" :lang="card.deck.language">{{ card.prompt }}</span>
+        <span class="flex-1 text-sm">{{ card.reading }}<small class="block text-[0.65rem] text-muted">{{ $t(card.deck.labelKey) }}</small></span>
         <UButton
           color="neutral"
           variant="outline"
@@ -31,11 +31,4 @@ const cards = computed(() => studyDecks.filter(deck => deck.mode === props.mode)
 </template>
 
 <style scoped>
-.collection-count { float: right; color: var(--ui-primary); }
-.collection-intro { margin-block: 1.2rem .8rem; }
-.mastered-list { display: grid; gap: .8rem; max-height: 360px; overflow-y: auto; padding: .25rem; }
-.mastered-list li { display: flex; align-items: center; gap: .8rem; }
-.mastered-character { font-size: 2rem; }
-.mastered-reading { flex: 1; font-size: .9rem; }
-.mastered-reading small { display: block; font-size: .65rem; color: var(--ui-text-muted); }
 </style>
