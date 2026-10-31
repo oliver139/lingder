@@ -12,7 +12,7 @@ const emit = defineEmits<{ rate: [rating: Rating], undo: [] }>()
         color="neutral"
         variant="outline"
         size="xl"
-        class="min-h-12 justify-center rounded-[1rem]"
+        class="min-h-12 cursor-pointer justify-center rounded-[1rem]"
         :disabled="disabled"
         icon="i-lucide-repeat-2"
         @click="emit('rate', 'review')"
@@ -21,7 +21,7 @@ const emit = defineEmits<{ rate: [rating: Rating], undo: [] }>()
       </UButton>
       <UButton
         size="xl"
-        class="min-h-12 justify-center rounded-[1rem]"
+        class="min-h-12 cursor-pointer justify-center rounded-[1rem]"
         :disabled="disabled"
         icon="i-lucide-check"
         @click="emit('rate', 'mastered')"
@@ -31,6 +31,7 @@ const emit = defineEmits<{ rate: [rating: Rating], undo: [] }>()
     </div>
     <UButton
       color="neutral"
+      class="min-h-10 cursor-pointer justify-center rounded-[1rem] px-4"
       variant="ghost"
       :disabled="!canUndo"
       icon="i-lucide-undo-2"
