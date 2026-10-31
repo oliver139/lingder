@@ -16,3 +16,33 @@ export interface StudyDeck {
   fontFamily: 'kana' | 'zhuyin'
   cards: readonly StudyCard[]
 }
+
+export interface StudySettings {
+  script: 'hiragana' | 'katakana' | 'both'
+  historical: boolean
+  goal: 5 | 10 | 20
+  reading: 'visible' | 'reveal'
+}
+
+export interface StudySession {
+  day: string
+  completed: string[]
+  queue: string[]
+  extra: boolean
+  extraCompleted: number
+  extraSeen: string[]
+}
+
+export interface ModeProgress {
+  settings: StudySettings
+  mastered: string[]
+  session: StudySession
+}
+
+export interface SavedStudy {
+  version: 1
+  mode: StudyMode
+  modes: Record<StudyMode, ModeProgress>
+}
+
+export type Rating = 'review' | 'mastered'

@@ -25,7 +25,7 @@ export default defineConfig({
           environment: 'jsdom',
           include: ['tests/**/*.{test,spec}.ts', 'app/**/*.{test,spec}.ts'],
           exclude: [...configDefaults.exclude, '**/*.browser.{test,spec}.ts'],
-          setupFiles: ['./tests/setup.ts'],
+          setupFiles: ['./tests/auto-imports.ts', './tests/setup.ts'],
         },
       },
       {
@@ -38,7 +38,7 @@ export default defineConfig({
         test: {
           name: 'browser',
           include: ['tests/**/*.browser.{test,spec}.ts', 'app/**/*.browser.{test,spec}.ts'],
-          setupFiles: ['vitest-browser-vue'],
+          setupFiles: ['./tests/auto-imports.ts', 'vitest-browser-vue'],
           browser: {
             enabled: true,
             headless: true,
