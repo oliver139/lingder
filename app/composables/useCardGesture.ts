@@ -14,6 +14,10 @@ export function useCardGesture(target: Readonly<ShallowRef<HTMLElement | null>>,
     offset.value = { x: 0, y: 0 }
   }
 
+  // Firefox can drag a page-wide selection even from a user-select:none card.
+  // Native drag would cancel our pointer gesture before pointerup arrives.
+  useEventListener(target, 'dragstart', event => event.preventDefault())
+
   useEventListener(target, 'pointerdown', (event) => {
     if (disabled() || !event.isPrimary || event.button !== 0 || pointer !== null) {
       return

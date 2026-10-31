@@ -217,3 +217,24 @@ it.each(['left', 'right', 'up', 'down'])('fades while dragging toward the %s edg
   expect(Number(getComputedStyle(element).opacity)).toBeCloseTo(0.1, 2)
   expect(rate).not.toHaveBeenCalled()
 })
+
+it('prevents native selection dragging from taking over a card swipe', async () => {
+  const { card, rate } = await setup()
+  const element = card.element()
+  vi.spyOn(element, 'setPointerCapture').mockImplementation(() => undefined)
+  const selection = window.getSelection()!
+  selection.selectAllChildren(document.body)
+  const selectedText = selection.toString()
+  try {
+    pointer(element, 'pointerdown', 150, 150)
+    const drag = new Event('dragstart', { bubbles: true, cancelable: true })
+    element.querySelector('.card-character')!.dispatchEvent(drag)
+    expect(drag.defaultPrevented).toBe(true)
+    expect(selection.toString()).toBe(selectedText)
+    pointer(element, 'pointermove', 260, 150)
+    pointer(element, 'pointerup', 260, 150)
+    await expect.poll(() => rate.mock.calls).toEqual([['ja-hiragana-a', 'review']])
+  } finally {
+    selection.removeAllRanges()
+  }
+})
