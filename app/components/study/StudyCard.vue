@@ -93,7 +93,7 @@ function keydown(event: KeyboardEvent) {
         <span v-else aria-hidden="true">✦</span>
       </div>
       <span class="card-character block text-[clamp(5rem,20vw,7rem)] leading-[1.7]" :class="deck.fontFamily === 'kana' ? 'font-kana' : 'font-zhuyin'" :lang="deck.language">{{ card.prompt }}</span>
-      <span id="card-reading" :class="showReading ? 'text-[1.6rem]' : 'my-1.5 text-base text-primary'" lang="en" aria-live="polite">{{ showReading ? card.reading : $t('study.tapReveal') }}</span>
+      <span id="card-reading" :class="showReading ? 'font-serif text-[1.6rem]' : 'my-1.5 text-base text-primary'" lang="en" aria-live="polite">{{ showReading ? card.reading : $t('study.tapReveal') }}</span>
       <span class="mt-auto pt-4 text-[0.7rem] text-muted">{{ $t(showReading ? 'study.takeYourTime' : 'study.revealHint') }}</span>
     </div>
   </div>
