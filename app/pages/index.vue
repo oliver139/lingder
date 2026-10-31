@@ -5,7 +5,6 @@ import { eligibleIds } from '../utils/study/session'
 const store = useStudyStore()
 const { storageWarning } = useStudyPersistence()
 const { t } = useI18n()
-const localePath = useLocalePath()
 const announcement = shallowRef('')
 const stage = useTemplateRef<HTMLElement>('stage')
 const session = computed(() => store.progress.session)
@@ -39,11 +38,7 @@ function undo() {
 </script>
 
 <template>
-  <div class="lingder-shell">
-    <header class="site-header">
-      <NuxtLink class="wordmark" :to="localePath('/')" :aria-label="$t('study.home')"><span class="brand-mark" aria-hidden="true">✦</span>{{ $t('study.brand') }}<span class="brand-dot">.</span></NuxtLink>
-      <div class="header-meta"><span>{{ $t('study.smallSteps') }}</span><ThemeToggler /></div>
-    </header>
+  <div>
     <div v-if="!store.ready" class="loading-state" role="status">{{ $t('study.loading') }}</div>
     <template v-else>
       <p v-if="storageWarning" class="storage-warning" role="alert">{{ $t(`study.storage.${storageWarning}`) }}</p>
@@ -88,7 +83,6 @@ function undo() {
           <p>{{ $t('study.reviewHint') }}</p>
         </aside>
       </div>
-      <footer class="site-footer"><span>{{ $t('study.footer') }}</span><span>{{ $t('study.localOnly') }}</span></footer>
     </template>
   </div>
 </template>

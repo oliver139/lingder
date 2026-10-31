@@ -17,7 +17,7 @@ Nuxt UI and Tailwind CSS supply the UI system. Enabled modules provide localizat
 | `app/app.vue` | Nuxt UI provider, locale synchronization, document metadata, and route composition |
 | `app/app.config.ts` | Application and Nuxt UI customization entry point |
 | `app/pages/` | File-based routes; the homepage composes the study flow |
-| `app/layouts/` | Page layouts; the default supplies a main landmark |
+| `app/layouts/` | Page layouts; the default composes UHeader, UMain, and UFooter |
 | `app/components/` | Reusable components; auto-imports use `pathPrefix: false` |
 | `app/utils/` | Pure session/persistence helpers and the browser-dependent theme toggle |
 | `app/data/` | Typed kana/Zhuyin arrays and the deck registry |

@@ -52,7 +52,6 @@ describe('study screen integration', () => {
     expect(wrapper.text()).toContain('Getting your cards ready')
     await nextTick()
     expect(wrapper.find('.study-card').exists()).toBe(true)
-    expect(wrapper.get('a').attributes('href')).toBe('/en/')
   })
 
   it('rates via buttons, undoes, restores mastery, and switches modes', async () => {
