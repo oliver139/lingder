@@ -6,9 +6,16 @@ const emit = defineEmits<{ change: [settings: Partial<StudySettings>] }>()
 </script>
 
 <template>
-  <details class="rounded-[1rem] border border-default bg-card p-5">
-    <summary class="cursor-pointer text-sm font-medium">{{ $t('study.settings') }}</summary>
-    <div class="grid gap-6 pt-6">
+  <details class="rounded-[1rem] border border-default bg-card">
+    <summary
+      class="
+        min-h-14 cursor-pointer rounded-[1rem] p-5 text-sm
+        font-medium
+      "
+    >
+      {{ $t('study.settings') }}
+    </summary>
+    <div class="grid gap-6 px-5 pt-1 pb-5">
       <fieldset v-if="mode === 'ja'" class="flex flex-wrap gap-3">
         <legend class="mb-2.5 text-sm font-semibold">{{ $t('study.scripts') }}</legend>
         <label

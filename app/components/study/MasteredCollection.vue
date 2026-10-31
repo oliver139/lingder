@@ -8,25 +8,34 @@ const cards = computed(() => studyDecks.filter(deck => deck.mode === props.mode)
 </script>
 
 <template>
-  <details class="rounded-[1rem] border border-default bg-card p-5">
-    <summary class="cursor-pointer text-sm font-medium">{{ $t('study.collection') }} <span class="float-right text-primary">{{ mastered.length }}</span></summary>
-    <p class="mt-5 mb-3 text-[0.7rem] leading-[1.7] text-muted">{{ $t('study.collectionHint') }}</p>
-    <p v-if="!cards.length" class="text-[0.7rem] leading-[1.7] text-muted">{{ $t('study.collectionEmpty') }}</p>
-    <ul v-else class="grid max-h-90 gap-3 overflow-y-auto p-1">
-      <li v-for="card in cards" :key="card.id" class="flex items-center gap-3">
-        <span class="text-[2rem]" :class="card.deck.fontFamily === 'kana' ? 'font-kana' : 'font-zhuyin'" :lang="card.deck.language">{{ card.prompt }}</span>
-        <span class="flex-1 text-sm">{{ card.reading }}<small class="block text-[0.65rem] text-muted">{{ $t(card.deck.labelKey) }}</small></span>
-        <UButton
-          color="neutral"
-          variant="outline"
-          size="sm"
-          :aria-label="$t('study.restoreLabel', { prompt: card.prompt, script: $t(card.deck.labelKey) })"
-          @click="emit('restore', card.id)"
-        >
-          {{ $t('study.restore') }}
-        </UButton>
-      </li>
-    </ul>
+  <details class="rounded-[1rem] border border-default bg-card">
+    <summary
+      class="
+        min-h-14 cursor-pointer rounded-[1rem] p-5 text-sm
+        font-medium
+      "
+    >
+      {{ $t('study.collection') }} <span class="float-right text-primary">{{ mastered.length }}</span>
+    </summary>
+    <div class="px-5 pb-5">
+      <p class="mb-3 text-[0.7rem] leading-[1.7] text-muted">{{ $t('study.collectionHint') }}</p>
+      <p v-if="!cards.length" class="text-[0.7rem] leading-[1.7] text-muted">{{ $t('study.collectionEmpty') }}</p>
+      <ul v-else class="grid max-h-90 gap-3 overflow-y-auto p-1">
+        <li v-for="card in cards" :key="card.id" class="flex items-center gap-3">
+          <span class="text-[2rem]" :class="card.deck.fontFamily === 'kana' ? 'font-kana' : 'font-zhuyin'" :lang="card.deck.language">{{ card.prompt }}</span>
+          <span class="flex-1 text-sm">{{ card.reading }}<small class="block text-[0.65rem] text-muted">{{ $t(card.deck.labelKey) }}</small></span>
+          <UButton
+            color="neutral"
+            variant="outline"
+            size="sm"
+            :aria-label="$t('study.restoreLabel', { prompt: card.prompt, script: $t(card.deck.labelKey) })"
+            @click="emit('restore', card.id)"
+          >
+            {{ $t('study.restore') }}
+          </UButton>
+        </li>
+      </ul>
+    </div>
   </details>
 </template>
 
