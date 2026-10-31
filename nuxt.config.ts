@@ -33,6 +33,7 @@ export default defineNuxtConfig({
   app: {
     head: {
       title: siteName,
+      link: [{ rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
       meta: [
         { name: 'twitter:card', content: siteImage ? 'summary_large_image' : 'summary' },
         { name: 'twitter:title', content: siteName },

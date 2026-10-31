@@ -1,4 +1,3 @@
-import { useStudyStore } from '../stores/study'
 import { decodeStudy, STUDY_STORAGE_KEY } from '../utils/study/persistence'
 
 export function useStudyPersistence() {

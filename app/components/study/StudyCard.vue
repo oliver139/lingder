@@ -60,7 +60,7 @@ function keydown(event: KeyboardEvent) {
       role="button"
       tabindex="0"
       :aria-label="$t('study.cardLabel', { script: $t(deck.labelKey), prompt: card.prompt })"
-      aria-describedby="card-help"
+      aria-describedby="card-help card-reading"
       @keydown="keydown"
       @click="!moved && (revealed = true)"
     >
@@ -70,8 +70,7 @@ function keydown(event: KeyboardEvent) {
         <span v-else aria-hidden="true">✦</span>
       </div>
       <span class="card-character" :class="deck.fontFamily" :lang="deck.language">{{ card.prompt }}</span>
-      <span v-if="showReading" class="card-reading" lang="en">{{ card.reading }}</span>
-      <span v-else class="card-reveal">{{ $t('study.tapReveal') }}</span>
+      <span id="card-reading" :class="showReading ? 'card-reading' : 'card-reveal'" lang="en" aria-live="polite">{{ showReading ? card.reading : $t('study.tapReveal') }}</span>
       <span class="card-footnote">{{ $t(showReading ? 'study.takeYourTime' : 'study.revealHint') }}</span>
     </div>
   </div>

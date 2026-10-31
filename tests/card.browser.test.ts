@@ -75,3 +75,41 @@ it('reveals with a real pointer click and resets reading for the next card', asy
   await userEvent.keyboard('{Enter}')
   await expect.element(page.getByText('i', { exact: true })).toBeVisible()
 })
+
+it.each([
+  ['ArrowLeft', 'review'],
+  ['ArrowRight', 'review'],
+  ['ArrowUp', 'mastered'],
+  ['ArrowDown', 'mastered'],
+] as const)('maps %s to %s while keeping the card focused', async (key, rating) => {
+  const { card, rate } = await setup()
+  await card.click()
+  await userEvent.keyboard(`{${key}}`)
+  expect(rate).toHaveBeenCalledExactlyOnceWith('ja-hiragana-a', rating)
+  await expect.element(card).toHaveFocus()
+})
+
+it('ignores secondary pointers, lost capture, held keys and detached elements', async () => {
+  const { card, rate, screen } = await setup()
+  const element = card.element()
+  vi.spyOn(element, 'setPointerCapture').mockImplementation(() => undefined)
+  element.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, pointerId: 5, isPrimary: false, button: 0 }))
+  pointer(element, 'pointerup', 150, 0, 5)
+  pointer(element, 'pointerdown', 150, 150)
+  pointer(element, 'pointermove', 270, 150, 2)
+  pointer(element, 'lostpointercapture', 150, 150)
+  pointer(element, 'pointerup', 270, 150)
+  element.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', repeat: true, bubbles: true }))
+  expect(rate).not.toHaveBeenCalled()
+  await screen.unmount()
+  pointer(element, 'pointerdown', 150, 150)
+  pointer(element, 'pointerup', 270, 150)
+  expect(rate).not.toHaveBeenCalled()
+})
+
+it('exposes the revealed reading as an accessible description', async () => {
+  const { card } = await setup()
+  await expect.element(card).toHaveAccessibleDescription('study.tapReveal')
+  await card.click()
+  await expect.element(card).toHaveAccessibleDescription('a')
+})

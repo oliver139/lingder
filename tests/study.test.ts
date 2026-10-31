@@ -11,7 +11,7 @@ import { eligibleIds, initialStudy, localDay, randomBatch } from '@/utils/study/
 beforeEach(() => {
   vi.useFakeTimers()
   vi.setSystemTime(new Date(2026, 9, 31, 12))
-  for (const [name, value] of Object.entries({ defineStore, ref, shallowRef, computed, watch, onMounted, useEventListener, useIntervalFn })) {
+  for (const [name, value] of Object.entries({ useStudyStore, defineStore, ref, shallowRef, computed, watch, onMounted, useEventListener, useIntervalFn })) {
     vi.stubGlobal(name, value)
   }
   setActivePinia(createPinia())

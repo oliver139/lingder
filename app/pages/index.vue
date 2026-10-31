@@ -7,10 +7,19 @@ const { storageWarning } = useStudyPersistence()
 const { t } = useI18n()
 const localePath = useLocalePath()
 const announcement = shallowRef('')
+const stage = useTemplateRef<HTMLElement>('stage')
 const session = computed(() => store.progress.session)
 const exhausted = computed(() => eligibleIds(store.saved.mode, store.progress).length === 0)
 const canUndo = computed(() => store.lastRating?.mode === store.saved.mode)
 const dailyPercent = computed(() => Math.min(100, session.value.completed.length / store.progress.settings.goal * 100))
+
+watch(() => store.current?.id, async (id, previous) => {
+  if (Boolean(id) === Boolean(previous) || !stage.value?.contains(document.activeElement)) {
+    return
+  }
+  await nextTick()
+  stage.value?.querySelector<HTMLElement>(id ? '.study-card' : '.completion')?.focus()
+})
 
 function rate(id: string, rating: Rating) {
   store.rate(id, rating)
@@ -56,7 +65,7 @@ function undo() {
           <StudySettings :settings="store.progress.settings" :mode="store.saved.mode" @change="store.setSettings" />
           <MasteredCollection :mode="store.saved.mode" :mastered="store.progress.mastered" @restore="store.restore" />
         </aside>
-        <section class="study-stage" :aria-label="$t('study.practice')">
+        <section ref="stage" class="study-stage" :aria-label="$t('study.practice')">
           <div class="session-heading"><span>{{ $t(session.extra ? 'study.extraPractice' : 'study.dailySession') }}</span><span>{{ $t('study.remaining', { count: session.queue.length }) }}</span></div>
           <StudyCard
             v-if="store.current"

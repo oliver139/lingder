@@ -2,13 +2,13 @@
 
 ## Project context
 
-Lingder is an English-first language-learning web app with a dating-style flashcard interface. Its approved first release covers Japanese kana and Taiwan Zhuyin, with progress saved in localStorage. The codebase currently contains the blank Nuxt 4, Vue 3, and TypeScript template; the learning features have not been implemented yet.
+Lingder is an English-first language-learning web app with a dating-style flashcard interface. Its approved first release covers Japanese kana and Taiwan Zhuyin, with progress saved in localStorage. The first release is implemented with Nuxt 4, Vue 3, and TypeScript: typed decks, daily sessions, browser persistence, swipe/keyboard controls, settings, mastery, and Undo.
 
 It has its own Git repository and must not import the source site's Git metadata, history, logs, or remotes.
 
 Use `package.json`, `pnpm-lock.yaml`, and repository configuration as the source of truth. Preserve dependency versions and the declared Node/pnpm runtime requirements unless a task explicitly changes them.
 
-Nuxt UI and Tailwind CSS supply the UI system. Enabled modules provide localization, color mode, fonts, icons, images, Pinia, and VueUse. Nuxt Content is installed but commented out. The approved visual direction is lavender and ink, with Google Noto Sans for interface text and language-appropriate Noto Serif families for flashcard characters, loaded through Nuxt Fonts. This visual direction has not been implemented yet.
+Nuxt UI and Tailwind CSS supply the UI system. Enabled modules provide localization, color mode, fonts, icons, images, Pinia, and VueUse. Nuxt Content is installed but commented out. The approved visual direction is lavender and ink, with Google Noto Sans for interface text and language-appropriate Noto Serif families for flashcard characters, loaded through Nuxt Fonts. The palette, responsive layouts, and Google Noto font configuration are implemented.
 
 ## Repository map
 
@@ -16,16 +16,19 @@ Nuxt UI and Tailwind CSS supply the UI system. Enabled modules provide localizat
 | --- | --- |
 | `app/app.vue` | Nuxt UI provider, locale synchronization, document metadata, and route composition |
 | `app/app.config.ts` | Application and Nuxt UI customization entry point |
-| `app/pages/` | File-based routes; the homepage starts empty |
+| `app/pages/` | File-based routes; the homepage composes the study flow |
 | `app/layouts/` | Page layouts; the default supplies a main landmark |
 | `app/components/` | Reusable components; auto-imports use `pathPrefix: false` |
-| `app/utils/` | Shared helpers, including the browser-dependent theme transition |
+| `app/utils/` | Pure session/persistence helpers and the browser-dependent theme transition |
+| `app/data/` | Typed kana/Zhuyin arrays and the deck registry |
+| `app/stores/` | Pinia settings, mastery, daily and extra-practice sessions |
+| `app/composables/` | Mounted persistence/calendar and pointer-gesture lifecycles |
 | `app/assets/css/` | Tailwind/Nuxt UI imports, reusable utilities, and functional transition styles |
 | `app/i18n/` | Vue I18n configuration and locale JSON files |
 | `public/` | Static assets |
 | `nuxt.config.ts` | Modules, metadata, localization, and Vite integration |
 | `vitest.config.ts` | Standalone unit and browser test projects |
-| `tests/` | Test setup and starter tests |
+| `tests/` | Unit, integration, and Chromium/WebKit interaction tests |
 | `.agents/skills/` | Bundled agent skills retained with `skills-lock.json` |
 
 Add reusable composables under `app/composables/`, Pinia stores under `app/stores/`, and Nitro endpoints under root-level `server/api/` when needed.
@@ -87,7 +90,7 @@ Make focused commits during implementation rather than collecting the entire app
 - Every custom production function or composable written in a `.ts` file must have meaningful Vitest coverage, including store actions and internal helpers through their public behavior. Add tests alongside new or changed behavior; the approved implementation also includes coverage for the existing theme helper. Data-only modules, type declarations, and framework configuration files do not require function tests merely because they use `.ts`.
 - The unit project uses jsdom and Vue Test Utils. The browser project uses Playwright, Chromium, WebKit, and `vitest-browser-vue`. Test behavior through public APIs and accessible interactions rather than private component state.
 - Use `*.browser.test.ts` or `*.browser.spec.ts` for browser tests; ordinary test files run only in the unit project. Vue wrappers and browser renders have automatic cleanup.
-- These are standalone Vue tests with explicit imports; Nuxt runtime, auto-imports, and plugins are not supplied. Add intentional Nuxt integration tooling when a task requires it.
+- These are standalone Vue tests with explicit imports. `tests/auto-imports.ts` supplies a narrow Vue/Pinia/VueUse boundary; Nuxt runtime, plugins, and `#imports` are not supplied. Add intentional Nuxt integration tooling when a task requires it.
 - Build only before `git push`, and push only after a successful build. Report failed or unavailable checks accurately.
 - Do not edit generated `.nuxt/`, `.output/`, `.data/`, or `node_modules/` files. Change sources and regenerate normally.
 - Keep upgrades and unrelated refactors outside the task. Preserve the MIT license and required attribution.

@@ -4,7 +4,7 @@ const emit = defineEmits<{ practice: [] }>()
 </script>
 
 <template>
-  <section class="completion" role="status">
+  <section class="completion" role="status" tabindex="-1">
     <span class="completion-mark" aria-hidden="true">✦</span>
     <h2>{{ $t(exhausted ? 'study.exhaustedTitle' : extra ? 'study.extraComplete' : 'study.completeTitle') }}</h2>
     <p>{{ $t(exhausted ? 'study.exhaustedHint' : 'study.completeHint') }}</p>
