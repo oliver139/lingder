@@ -83,7 +83,7 @@ Only commit when the user explicitly asks; do not commit automatically. When com
 - Use Valibot when form validation is needed. Fixed-choice settings do not require a validation dependency by themselves.
 - Active locales are English (`en`, default) and Traditional Chinese (`zh`, language `zh-Hant`). Japanese (`ja`) remains commented out in the Nuxt configuration with an empty locale file ready to enable.
 - Put user-facing copy in locale files. Add English first and use English fallback until translations are requested.
-- Use locale-aware links and preserve `prefix_and_default` routing unless the task changes it. Preserve reactive `useLocaleHead()` metadata.
+- Use `<NuxtLinkLocale>` from `@nuxtjs/i18n` for internal page links, passing unlocalized paths or route names directly instead of wrapping `<NuxtLink>` destinations in `localePath()`. Use ordinary anchors for external URLs. Preserve `prefix_and_default` routing and reactive `useLocaleHead()` metadata. When custom active-link handling is needed across prefixed and unprefixed URLs, use `custom` with `useRouteBaseName(route)`.
 - Public metadata uses `SITE_NAME`, `SITE_DESC`, `SITE_URL`, and `SITE_IMG`. Document safe examples in `.env.example`; keep local environment files ignored and never put secrets in public metadata.
 
 ## Testing and validation

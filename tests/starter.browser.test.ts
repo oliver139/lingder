@@ -4,7 +4,8 @@ import { page } from 'vitest/browser'
 import { defineComponent } from 'vue'
 import DefaultLayout from '@/layouts/default.vue'
 
-vi.stubGlobal('useLocalePath', () => (path: string) => path)
+vi.stubGlobal('useRoute', () => ({ name: 'index___en' }))
+vi.stubGlobal('useRouteBaseName', () => () => 'index')
 
 it('renders slotted content with working browser input and focus', async () => {
   await render(DefaultLayout, {
@@ -14,8 +15,9 @@ it('renders slotted content with working browser input and focus', async () => {
         UHeader: defineComponent({ template: '<header><slot name="left" /><slot name="right" /></header>' }),
         UMain: defineComponent({ template: '<main><slot /></main>' }),
         UFooter: defineComponent({ template: '<footer><slot name="left" /><slot name="right" /></footer>' }),
-        NuxtLink: true,
+        NuxtLinkLocale: true,
         ThemeToggler: true,
+        AudioCredits: true,
       },
     },
     slots: {

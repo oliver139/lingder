@@ -31,7 +31,6 @@ beforeEach(() => {
   vi.stubGlobal('useCardGesture', useCardGesture)
   vi.stubGlobal('usePronunciationAudio', usePronunciationAudio)
   vi.stubGlobal('useI18n', () => ({ t }))
-  vi.stubGlobal('useLocalePath', () => (path: string) => `/en${path}`)
 })
 
 function screen() {
@@ -41,7 +40,6 @@ function screen() {
       components: { MasteredCollection, ModeSelector, RatingControls, StudyCard, StudyComplete, StudySettings },
       stubs: {
         ThemeToggler: true,
-        NuxtLink: defineComponent({ props: ['to'], template: '<a :href="to"><slot /></a>' }),
         UButton: defineComponent({ props: ['disabled', 'icon', 'color', 'variant', 'size'], template: '<button :disabled="disabled"><slot /></button>' }),
       },
     },

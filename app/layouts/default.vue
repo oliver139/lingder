@@ -1,5 +1,4 @@
 <script setup lang="ts">
-const localePath = useLocalePath()
 const getRouteBaseName = useRouteBaseName()
 const route = useRoute()
 </script>
@@ -17,16 +16,16 @@ const route = useRoute()
     >
       <UHeader :toggle="false" class="static h-auto border-0 bg-transparent backdrop-blur-none" :ui="{ container: 'flex min-h-18 items-center justify-between border-b border-default sm:min-h-24 h-auto px-0 sm:px-0 lg:px-0', left: 'lg:flex-none', right: 'lg:flex-none' }">
         <template #left>
-          <NuxtLink
+          <NuxtLinkLocale
             class="
               flex items-center gap-0.5 text-[1.6rem] font-bold
               tracking-[-0.07em] text-highlighted
             "
-            :to="localePath('/')"
+            to="/"
             :aria-label="$t('study.home')"
           >
             <span class="mr-2.5 text-2xl text-primary" aria-hidden="true">✦</span>{{ $t('study.brand') }}<span class="text-primary">.</span>
-          </NuxtLink>
+          </NuxtLinkLocale>
         </template>
         <template #right>
           <div class="flex items-center gap-1 sm:gap-4">
@@ -37,11 +36,11 @@ const route = useRoute()
               "
               :aria-label="$t('app.navigation.label')"
             >
-              <NuxtLink
+              <NuxtLinkLocale
                 v-for="link in [{ path: '/', name: 'index', label: 'cards' }, { path: '/table', name: 'table', label: 'table' }]"
                 :key="link.name"
                 v-slot="{ href, navigate }"
-                :to="localePath(link.path)"
+                :to="link.path"
                 custom
               >
                 <a
@@ -56,7 +55,7 @@ const route = useRoute()
                   :aria-current="getRouteBaseName(route) === link.name ? 'page' : undefined"
                   @click="navigate"
                 >{{ $t(`app.navigation.${link.label}`) }}</a>
-              </NuxtLink>
+              </NuxtLinkLocale>
             </nav>
             <ThemeToggler />
           </div>
