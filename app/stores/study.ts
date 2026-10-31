@@ -59,7 +59,12 @@ export const useStudyStore = defineStore('study', () => {
     if (next.goal === previous.goal && next.script === previous.script && next.historical === previous.historical) {
       return
     }
-    // Only session-affecting settings return to the daily session.
+    const filtersUnchanged = next.script === previous.script && next.historical === previous.historical
+    if (filtersUnchanged && progress.value.session.extra && studiedCount.value >= next.goal) {
+      lastRating.value = null
+      return
+    }
+    // Filter changes and unmet goals return to the daily session.
     progress.value.session.extra = false
     progress.value.session = reconcileSession(saved.value.mode, progress.value, localDay())
     lastRating.value = null

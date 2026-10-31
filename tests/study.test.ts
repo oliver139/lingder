@@ -205,6 +205,63 @@ describe('daily study store', () => {
     expect(store.extraCount).toBe(0)
   })
 
+  it.each(['ja', 'tw'] as const)('keeps the active %s extra batch across met-goal changes and reloads', (mode) => {
+    const store = initialized()
+    store.setMode(mode)
+    store.setSettings({ goal: 20 })
+    finishDaily(store)
+    store.startExtra()
+    store.rate(store.current!.id, 'review')
+    const currentId = store.current!.id
+    const session = JSON.parse(JSON.stringify(store.progress.session))
+    for (const goal of [5, 10, 20, 5] as const) {
+      store.setSettings({ goal })
+      expect(store.current!.id).toBe(currentId)
+      expect(store.progress.session).toEqual(session)
+      expect(store.dailyCount).toBe(goal)
+      expect(store.extraCount).toBe(21 - goal)
+      expect(store.lastRating).toBeNull()
+      store.initialize(decodeStudy(JSON.stringify(store.saved)))
+      expect(store.current!.id).toBe(currentId)
+      expect(store.progress.session).toEqual(session)
+    }
+    finishDaily(store)
+    expect(store.studiedCount).toBe(40)
+    store.initialize(decodeStudy(JSON.stringify(store.saved)))
+    expect(store.current).toBeNull()
+    store.startExtra()
+    expect(store.progress.session.queue).toHaveLength(5)
+  })
+
+  it('keeps a smaller extra batch when an increased goal is already met', () => {
+    const store = initialized()
+    store.setSettings({ goal: 5 })
+    finishDaily(store)
+    store.startExtra()
+    finishDaily(store)
+    store.startExtra()
+    store.rate(store.current!.id, 'review')
+    const session = JSON.parse(JSON.stringify(store.progress.session))
+    store.setSettings({ goal: 10 })
+    expect(store.progress.session).toEqual(session)
+    expect(store.dailyCount).toBe(10)
+    expect(store.extraCount).toBe(1)
+    store.initialize(decodeStudy(JSON.stringify(store.saved)))
+    expect(store.progress.session).toEqual(session)
+  })
+
+  it('still applies deck-filter changes when the daily goal is already met', () => {
+    const store = initialized()
+    store.setSettings({ goal: 20 })
+    finishDaily(store)
+    store.startExtra()
+    store.setSettings({ goal: 5, script: 'katakana' })
+    expect(store.progress.session.extra).toBe(false)
+    expect(store.current).toBeNull()
+    expect(store.dailyCount).toBe(5)
+    expect(store.extraCount).toBe(15)
+  })
+
   it('credits previous extra practice toward an increased goal and queues only the shortfall', () => {
     const store = initialized()
     store.setSettings({ goal: 5 })

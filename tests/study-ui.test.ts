@@ -98,6 +98,27 @@ describe('study screen integration', () => {
     expect(wrapper.text()).toContain('Plus 20 extra practice cards')
   })
 
+  it('keeps the visible extra-practice card when lowering an already-met goal', async () => {
+    const wrapper = screen()
+    await nextTick()
+    const store = useStudyStore()
+    store.setSettings({ goal: 20 })
+    while (store.current) {
+      store.rate(store.current.id, 'review')
+    }
+    store.startExtra()
+    store.rate(store.current!.id, 'review')
+    await nextTick()
+    const card = wrapper.get('.study-card').element
+    const queue = [...store.progress.session.queue]
+    await wrapper.findAll('input[name="goal"]')[0]!.setValue(true)
+    expect(wrapper.get('.study-card').element).toBe(card)
+    expect(store.progress.session.queue).toEqual(queue)
+    expect(store.progress.session.extra).toBe(true)
+    expect(wrapper.text()).toContain('19 left')
+    expect(wrapper.text()).toContain('Plus 16 extra practice cards')
+  })
+
   it('updates settings, completes a goal and begins extra practice', async () => {
     const wrapper = screen()
     await nextTick()

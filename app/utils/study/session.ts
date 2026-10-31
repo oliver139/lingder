@@ -41,7 +41,10 @@ export function reconcileSession(mode: StudyMode, progress: ModeProgress, day: s
   const seen = session.extra ? session.extraSeen : session.completed
   const eligible = eligibleIds(mode, progress).filter(id => !seen.includes(id))
   const studied = session.completed.length + session.extraCompleted
-  const remaining = Math.max(0, progress.settings.goal - (session.extra ? session.extraSeen.length : studied))
+  // An extra batch keeps its original size, including across goal changes and reloads.
+  // Only a fresh batch (no queued or seen cards) uses the current goal.
+  const extraRemaining = session.queue.length || session.extraSeen.length ? session.queue.length : progress.settings.goal
+  const remaining = session.extra ? extraRemaining : Math.max(0, progress.settings.goal - studied)
   const retained = session.queue.filter(id => eligible.includes(id)).slice(0, remaining)
   const added = randomBatch(eligible.filter(id => !retained.includes(id)), remaining - retained.length)
   return { ...session, queue: [...retained, ...added] }
