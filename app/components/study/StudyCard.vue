@@ -108,9 +108,7 @@ function keydown(event: KeyboardEvent) {
     ref="stack"
     class="
       relative isolate z-10 mx-auto w-full
-      max-w-100
-      laptop:max-w-none
-      desktop:max-w-100
+      max-w-[21.09375rem]
     "
   >
     <TransitionGroup
@@ -129,11 +127,11 @@ function keydown(event: KeyboardEvent) {
         }"
         :data-card-id="item.id"
         class="
-          relative col-start-1 row-start-1 flex min-h-85
-          touch-none flex-col items-center rounded-[1.75rem] border
-          border-accented bg-card p-6 shadow-card select-none
+          relative col-start-1 row-start-1 flex aspect-3/4
+          w-full touch-none flex-col items-center rounded-[1.75rem]
+          border border-accented bg-card p-6 shadow-card
+          select-none
           motion-reduce:transition-none
-          max-[480px]:min-h-75
         "
         :class="[index === 0 ? 'study-card' : 'pointer-events-none', dragging && index === 0 ? 'cursor-grabbing transition-none' : 'cursor-grab transition-[transform,opacity] duration-240 ease-out']"
         :style="{ zIndex: cards.length - index, transform: index === 0 ? `translate(${offset.x}px, ${offset.y}px) rotate(${offset.x / 25}deg)` : `translateY(${index * 10}px) rotate(${index === 1 ? 4 : -4}deg) scale(${1 - index * 0.025})` }"
@@ -157,7 +155,7 @@ function keydown(event: KeyboardEvent) {
           <span v-if="item.historical" class="text-primary">{{ $t('study.historicalBadge') }}</span>
           <span v-else aria-hidden="true">✦</span>
         </div>
-        <span class="card-character block text-[clamp(5rem,20vw,7rem)] leading-[1.7]" :class="item.deck.fontFamily === 'kana' ? 'font-kana' : 'font-zhuyin'" :lang="item.deck.language">{{ item.prompt }}</span>
+        <span class="card-character mt-auto block text-[clamp(5rem,20vw,7rem)] leading-[1.7]" :class="item.deck.fontFamily === 'kana' ? 'font-kana' : 'font-zhuyin'" :lang="item.deck.language">{{ item.prompt }}</span>
         <span :id="index === 0 ? 'card-reading' : undefined" class="grid min-h-10 place-items-center" lang="en" aria-live="polite">
           <span
             class="

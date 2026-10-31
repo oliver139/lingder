@@ -6,7 +6,7 @@ const emit = defineEmits<{ rate: [rating: Rating], undo: [] }>()
 </script>
 
 <template>
-  <div class="grid justify-items-center gap-2.5">
+  <div class="grid justify-items-center gap-4">
     <div class="grid w-full grid-cols-2 gap-3">
       <UButton
         color="neutral"

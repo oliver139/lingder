@@ -6,9 +6,10 @@ const emit = defineEmits<{ practice: [] }>()
 <template>
   <section
     class="
-      completion flex min-h-85 flex-col items-center
-      justify-center gap-5 rounded-[1.75rem] border border-default
-      bg-card p-8 text-center
+      completion mx-auto flex aspect-3/4 w-full
+      max-w-[21.09375rem] flex-col items-center justify-center gap-4
+      rounded-[1.75rem] border border-default bg-card p-6
+      text-center
     "
     role="status"
     tabindex="-1"
