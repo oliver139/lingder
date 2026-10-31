@@ -9,7 +9,6 @@ const { t } = useI18n()
 const announcement = shallowRef('')
 const cardStack = useTemplateRef('cardStack')
 const animating = shallowRef(false)
-const lastExit = shallowRef<{ x: number, y: number }>()
 const switchingMode = shallowRef(false)
 const upcoming = computed(() => store.progress.session.queue.slice(1, 3).flatMap(id =>
   studyDecks.flatMap(deck => deck.cards.filter(card => card.id === id).map(card => ({ ...card, deck }))),
@@ -29,8 +28,7 @@ watch(() => store.current?.id, async (id, previous) => {
 })
 
 function rate(id: string, rating: Rating, exit?: { x: number, y: number }) {
-  lastExit.value = exit
-  store.rate(id, rating)
+  store.rate(id, rating, exit)
   announcement.value = t(rating === 'mastered' ? 'study.ratedMastered' : 'study.ratedReview')
 }
 
@@ -44,10 +42,13 @@ async function undo() {
   if (!canUndo.value || animating.value || switchingMode.value) {
     return
   }
-  store.undo()
+  const undone = store.undo()
+  if (!undone) {
+    return
+  }
   announcement.value = t('study.undone')
   await nextTick()
-  cardStack.value?.returnCard(lastExit.value)
+  cardStack.value?.returnCard(undone.exit)
 }
 </script>
 

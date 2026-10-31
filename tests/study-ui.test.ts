@@ -74,6 +74,25 @@ describe('study screen integration', () => {
     expect(wrapper.find('input[name="script"]').exists()).toBe(false)
   })
 
+  it('keeps Undo enabled until all ratings are reversed', async () => {
+    const wrapper = screen()
+    await nextTick()
+    const store = useStudyStore()
+    const ids = store.progress.session.queue.slice(0, 3)
+    const rate = wrapper.findAll('button').find(button => button.text() === 'Mastered')!
+    const undo = wrapper.findAll('button').find(button => button.text() === 'Undo last rating')!
+    for (let index = 0; index < 3; index++) {
+      await rate.trigger('click')
+    }
+    for (let index = 2; index >= 0; index--) {
+      expect(undo.attributes('disabled')).toBeUndefined()
+      await undo.trigger('click')
+      expect(store.current!.id).toBe(ids[index])
+    }
+    expect(undo.attributes('disabled')).toBeDefined()
+    expect(store.progress.mastered).toEqual([])
+  })
+
   it('updates daily, extra and accessible progress totals when the goal changes', async () => {
     const wrapper = screen()
     await nextTick()

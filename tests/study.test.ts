@@ -97,6 +97,87 @@ describe('daily study store', () => {
     expect(store.progress.session.queue).not.toContain(id)
   })
 
+  it('undoes multiple mixed ratings in reverse order with their original exits', () => {
+    const store = initialized()
+    const original = JSON.parse(JSON.stringify(store.progress))
+    const ids = store.progress.session.queue.slice(0, 3)
+    const exits = [{ x: -900, y: 0 }, { x: 0, y: 800 }, { x: 900, y: 0 }]
+    for (const [index, id] of ids.entries()) {
+      store.rate(id, index === 1 ? 'mastered' : 'review', exits[index])
+    }
+    store.setSettings({ reading: 'reveal' })
+    for (let index = 2; index >= 0; index--) {
+      expect(store.undo()?.exit).toEqual(exits[index])
+      expect(store.current!.id).toBe(ids[index])
+      expect(store.dailyCount).toBe(index)
+      expect(store.progress.settings.reading).toBe('reveal')
+    }
+    expect(store.progress).toEqual({ ...original, settings: { ...original.settings, reading: 'reveal' } })
+    expect(store.undo()).toBeUndefined()
+  })
+
+  it('keeps the entire deck history through completion and drops it on reload', () => {
+    const store = initialized()
+    // A longer deck must not have an arbitrary Undo limit.
+    store.progress.session.queue = eligibleIds('ja', store.progress).slice(0, 25)
+    const ids = [...store.progress.session.queue]
+    finishDaily(store)
+    for (let index = 24; index >= 0; index--) {
+      expect(store.undo()).toBeDefined()
+      expect(store.current!.id).toBe(ids[index])
+    }
+    expect(store.undo()).toBeUndefined()
+    expect(store.dailyCount).toBe(0)
+    store.rate(store.current!.id, 'review')
+    store.initialize(decodeStudy(JSON.stringify(store.saved)))
+    expect(store.lastRating).toBeNull()
+    expect(store.undoHistory).toEqual([])
+  })
+
+  it('clears history when switching languages but not when reselecting the same language', () => {
+    const store = initialized()
+    const ja = store.progress.session.queue.slice(0, 2)
+    ja.forEach(id => store.rate(id, 'mastered'))
+    store.setMode('ja')
+    expect(store.lastRating).not.toBeNull()
+    store.setMode('tw')
+    expect(store.undo()).toBeUndefined()
+    store.rate(store.current!.id, 'review')
+    store.setMode('ja')
+    expect(store.undo()).toBeUndefined()
+    expect(store.progress.session.completed).toEqual(ja)
+    store.setMode('tw')
+    expect(store.undo()).toBeUndefined()
+  })
+
+  it('can rate again after Undo without corrupting older snapshots', () => {
+    const store = initialized()
+    const ids = store.progress.session.queue.slice(0, 3)
+    ids.forEach(id => store.rate(id, 'mastered'))
+    store.undo()
+    store.rate(ids[2]!, 'review')
+    store.undo()
+    store.undo()
+    store.undo()
+    expect(store.current!.id).toBe(ids[0])
+    expect(store.progress.mastered).toEqual([])
+    expect(store.dailyCount).toBe(0)
+  })
+
+  it('undoes an extra batch back to its initial queue and totals', () => {
+    const store = initialized()
+    store.setSettings({ goal: 5 })
+    finishDaily(store)
+    store.startExtra()
+    const original = JSON.parse(JSON.stringify(store.progress))
+    finishDaily(store)
+    for (let index = 0; index < 5; index++) {
+      expect(store.undo()).toBeDefined()
+    }
+    expect(store.progress).toEqual(original)
+    expect(store.undo()).toBeUndefined()
+  })
+
   it('retains completed work and adjusts remaining cards on settings changes', () => {
     const store = initialized()
     for (let i = 0; i < 6; i++) {
@@ -342,7 +423,7 @@ describe('daily study store', () => {
     expect(store.current!.id).toBe(id)
   })
 
-  it('does not undo another mode and preserves its last rating when switching', () => {
+  it('does not restore previous deck history after switching back', () => {
     const store = initialized()
     const id = store.current!.id
     store.rate(id, 'mastered')
@@ -350,8 +431,9 @@ describe('daily study store', () => {
     store.undo()
     expect(store.progress.session.completed).toEqual([])
     store.setMode('ja')
-    store.undo()
-    expect(store.current!.id).toBe(id)
+    expect(store.undo()).toBeUndefined()
+    expect(store.progress.session.completed).toEqual([id])
+    expect(store.current!.id).not.toBe(id)
   })
 })
 

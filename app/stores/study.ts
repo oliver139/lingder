@@ -2,10 +2,17 @@ import type { ModeProgress, Rating, SavedStudy, StudyMode, StudySettings } from 
 import { studyDecks } from '../data/decks'
 import { emptySession, initialStudy, localDay, reconcileSession } from '../utils/study/session'
 
+interface UndoEntry {
+  mode: StudyMode
+  progress: ModeProgress
+  exit?: { x: number, y: number }
+}
+
 export const useStudyStore = defineStore('study', () => {
   const saved = ref<SavedStudy>(initialStudy())
   const ready = shallowRef(false)
-  const lastRating = shallowRef<{ mode: StudyMode, progress: ModeProgress } | null>(null)
+  const undoHistory = shallowRef<UndoEntry[]>([])
+  const lastRating = computed(() => undoHistory.value.at(-1) ?? null)
   const progress = computed(() => saved.value.modes[saved.value.mode])
   // Reclassify today's total against the current goal without rewriting rating history.
   const studiedCount = computed(() => progress.value.session.completed.length + progress.value.session.extraCompleted)
@@ -31,7 +38,7 @@ export const useStudyStore = defineStore('study', () => {
       if (state.session.day !== day) {
         state.session = reconcileSession(mode, state, day)
         if (lastRating.value?.mode === mode) {
-          lastRating.value = null
+          undoHistory.value = []
         }
       }
     }
@@ -39,7 +46,7 @@ export const useStudyStore = defineStore('study', () => {
 
   function initialize(value: SavedStudy | null, day = localDay()) {
     saved.value = value ?? initialStudy()
-    lastRating.value = null
+    undoHistory.value = []
     for (const mode of ['ja', 'tw'] as const) {
       saved.value.modes[mode].session = reconcileSession(mode, saved.value.modes[mode], day)
     }
@@ -48,7 +55,10 @@ export const useStudyStore = defineStore('study', () => {
 
   function setMode(mode: StudyMode) {
     refreshDay()
-    saved.value.mode = mode
+    if (mode !== saved.value.mode) {
+      undoHistory.value = []
+      saved.value.mode = mode
+    }
   }
 
   function setSettings(settings: Partial<StudySettings>) {
@@ -61,21 +71,22 @@ export const useStudyStore = defineStore('study', () => {
     }
     const filtersUnchanged = next.script === previous.script && next.historical === previous.historical
     if (filtersUnchanged && progress.value.session.extra && studiedCount.value >= next.goal) {
-      lastRating.value = null
+      undoHistory.value = []
       return
     }
     // Filter changes and unmet goals return to the daily session.
     progress.value.session.extra = false
     progress.value.session = reconcileSession(saved.value.mode, progress.value, localDay())
-    lastRating.value = null
+    undoHistory.value = []
   }
 
-  function rate(id: string, rating: Rating) {
+  function rate(id: string, rating: Rating, exit?: { x: number, y: number }) {
     refreshDay()
     if (!ready.value || current.value?.id !== id) {
       return
     }
-    lastRating.value = { mode: saved.value.mode, progress: JSON.parse(JSON.stringify(progress.value)) as ModeProgress }
+    const entry: UndoEntry = { mode: saved.value.mode, progress: JSON.parse(JSON.stringify(progress.value)) as ModeProgress, exit: exit ? { ...exit } : undefined }
+    undoHistory.value = [...undoHistory.value, entry]
     const session = progress.value.session
     session.queue.shift()
     if (session.extra) {
@@ -94,18 +105,20 @@ export const useStudyStore = defineStore('study', () => {
     if (!lastRating.value || lastRating.value.mode !== saved.value.mode) {
       return
     }
-    saved.value.modes[lastRating.value.mode] = {
-      ...lastRating.value.progress,
-      settings: { ...lastRating.value.progress.settings, reading: progress.value.settings.reading },
+    const entry = lastRating.value
+    saved.value.modes[entry.mode] = {
+      ...entry.progress,
+      settings: { ...entry.progress.settings, reading: progress.value.settings.reading },
     }
-    lastRating.value = null
+    undoHistory.value = undoHistory.value.slice(0, -1)
+    return entry
   }
 
   function restore(id: string) {
     refreshDay()
     progress.value.mastered = progress.value.mastered.filter(cardId => cardId !== id)
     progress.value.session = reconcileSession(saved.value.mode, progress.value, localDay())
-    lastRating.value = null
+    undoHistory.value = []
   }
 
   function startExtra() {
@@ -116,8 +129,8 @@ export const useStudyStore = defineStore('study', () => {
     const session = progress.value.session
     progress.value.session = { ...emptySession(session.day), completed: session.completed, extra: true, extraCompleted: session.extraCompleted }
     progress.value.session = reconcileSession(saved.value.mode, progress.value, localDay())
-    lastRating.value = null
+    undoHistory.value = []
   }
 
-  return { saved, ready, lastRating, progress, studiedCount, dailyCount, extraCount, current, initialize, refreshDay, setMode, setSettings, rate, undo, restore, startExtra }
+  return { saved, ready, undoHistory, lastRating, progress, studiedCount, dailyCount, extraCount, current, initialize, refreshDay, setMode, setSettings, rate, undo, restore, startExtra }
 })
