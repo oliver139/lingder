@@ -19,7 +19,7 @@ Nuxt UI and Tailwind CSS supply the UI system. Enabled modules provide localizat
 | `app/pages/` | File-based routes; the homepage composes the study flow |
 | `app/layouts/` | Page layouts; the default supplies a main landmark |
 | `app/components/` | Reusable components; auto-imports use `pathPrefix: false` |
-| `app/utils/` | Pure session/persistence helpers and the browser-dependent theme transition |
+| `app/utils/` | Pure session/persistence helpers and the browser-dependent theme toggle |
 | `app/data/` | Typed kana/Zhuyin arrays and the deck registry |
 | `app/stores/` | Pinia settings, mastery, daily and extra-practice sessions |
 | `app/composables/` | Mounted persistence/calendar and pointer-gesture lifecycles |
@@ -52,7 +52,7 @@ Use `pnpm install --frozen-lockfile` in CI. Commit lockfile changes with intenti
 
 When requested to create a new function or component, present a plan covering behavior, affected files, interfaces, and validation, and wait for agreement before implementation. Revisions to existing functions or components do not require this approval unless requested. Existing user authorization and explicit task instructions take precedence.
 
-Make focused commits during implementation rather than collecting the entire app into one commit. Include relevant tests with the behavior they verify, and validate each coherent change before committing.
+Only commit when the user explicitly asks; do not commit automatically. When commits are requested, make focused commits rather than collecting the entire app into one commit. Include relevant tests with the behavior they verify, and validate each coherent change before committing.
 
 ## Vue, Nuxt, and TypeScript
 
@@ -67,7 +67,7 @@ Make focused commits during implementation rather than collecting the entire app
 - Default to `shallowRef`; use `ref` when deep reactivity is needed. Avoid `reactive`. Derive values with `computed` and use watchers for side effects.
 - Use Pinia for shared state and `useState` for small SSR-hydrated shared values. Never keep request-specific state in module-level mutable refs.
 - Prefer existing VueUse utilities and clean up listeners and effects. Guard browser APIs and preserve hydration safety.
-- Preserve the theme helper's feature detection and reduced-motion fallback. Do not add production debug logs.
+- Nuxt color mode owns theme state and persistence. Preserve the native fade and immediate reduced-motion fallback. Do not add production debug logs.
 
 ## UI and localization
 

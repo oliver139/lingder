@@ -15,8 +15,8 @@ onMounted(() => {
     @click="toggleDark"
   >
     <template #leading="{ ui }">
-      <UIcon name="i-bx-sun" :class="ui.leadingIcon()" class="dark:hidden" aria-hidden="true" />
-      <UIcon name="i-bx-moon" :class="ui.leadingIcon()" class="hidden dark:inline-block" aria-hidden="true" />
+      <UIcon name="i-bx-moon" :class="ui.leadingIcon()" class="dark:hidden" aria-hidden="true" />
+      <UIcon name="i-bx-sun" :class="ui.leadingIcon()" class="hidden dark:inline-block" aria-hidden="true" />
     </template>
   </UButton>
 </template>

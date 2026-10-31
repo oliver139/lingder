@@ -6,13 +6,21 @@
 @import "./tw-module/position.css";
 @import "./tw-module/variant.css";
 
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation-duration: 500ms;
-}
-
 @theme {
   --font-sans: "Noto Sans", sans-serif;
+}
+
+::view-transition-group(*) {
+  animation-duration: 420ms;
+  animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none;
+  }
 }
 
 :root {

@@ -61,8 +61,8 @@ export default defineNuxtConfig({
     '@/assets/css/main.css',
   ],
 
-  experimental: {
-    viewTransition: true,
+  colorMode: {
+    disableTransition: true,
   },
 
   compatibilityDate: '2025-07-15',
