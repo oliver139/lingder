@@ -109,6 +109,8 @@ function keydown(event: KeyboardEvent) {
     class="
       relative isolate z-10 mx-auto w-full
       max-w-100
+      laptop:max-w-none
+      desktop:max-w-100
     "
   >
     <TransitionGroup

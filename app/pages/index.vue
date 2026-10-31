@@ -67,13 +67,14 @@ function undo() {
           flex flex-col items-start gap-6 pt-6
           pb-12
           sm:gap-8 sm:pt-10
-          desktop:grid desktop:grid-cols-[minmax(200px,1fr)_minmax(300px,400px)_minmax(150px,1fr)] desktop:gap-[clamp(1.5rem,4vw,3.5rem)]
+          laptop:mx-auto laptop:grid laptop:w-full laptop:max-w-228 laptop:grid-cols-[minmax(240px,360px)_minmax(400px,520px)]
+          desktop:max-w-none desktop:grid-cols-[minmax(200px,1fr)_minmax(300px,400px)_minmax(150px,1fr)] desktop:gap-[clamp(1.5rem,4vw,3.5rem)]
         "
       >
         <aside
           class="
             mx-auto grid w-full max-w-100 gap-3.5
-            desktop:max-w-none
+            laptop:max-w-none
           "
         >
           <div
@@ -115,7 +116,8 @@ function undo() {
           class="
             study-stage order-first mx-auto w-full max-w-100
             min-w-0
-            desktop:order-0
+            laptop:order-0 laptop:max-w-none
+            desktop:max-w-100
           "
           :aria-label="$t('study.practice')"
         >

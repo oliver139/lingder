@@ -4,7 +4,8 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --breakpoint-desktop: 64.0625rem;
+  --breakpoint-laptop: 64.0625rem;
+  --breakpoint-desktop: 80.0625rem;
   --font-kana: "Noto Serif JP", serif;
   --font-zhuyin: "Noto Serif TC", serif;
   --shadow-card: 0 16px 48px -24px var(--study-shadow);
