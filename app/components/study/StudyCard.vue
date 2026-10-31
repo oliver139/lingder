@@ -20,6 +20,28 @@ const cards = computed(() => [{ ...props.card, deck: props.deck }, ...(props.upc
 
 const { offset, dragging, moved, cancel } = useCardGesture(surface, rate, () => committed.value)
 
+// Start fading when the center enters the outer 30% of the viewport.
+// Resting bounds keep transformed measurements out of the pointer feedback loop.
+function opacityAt(x: number, y: number, bounds: DOMRect) {
+  const centerX = bounds.left + bounds.width / 2
+  const centerY = bounds.top + bounds.height / 2
+  const horizontalEdge = x < 0 ? centerX : window.innerWidth - centerX
+  const verticalEdge = y < 0 ? centerY : window.innerHeight - centerY
+  const horizontalStart = Math.max(0, horizontalEdge - window.innerWidth * 0.3)
+  const verticalStart = Math.max(0, verticalEdge - window.innerHeight * 0.3)
+  const horizontal = Math.max(0, Math.abs(x) - horizontalStart) / Math.max(1, horizontalEdge + bounds.width / 2 - horizontalStart)
+  const vertical = Math.max(0, Math.abs(y) - verticalStart) / Math.max(1, verticalEdge + bounds.height / 2 - verticalStart)
+  return Math.max(0, 1 - Math.max(horizontal, vertical))
+}
+
+const opacity = computed(() => {
+  const { x, y } = offset.value
+  if ((!x && !y) || !stack.value) {
+    return 1
+  }
+  return opacityAt(x, y, stack.value.getBoundingClientRect())
+})
+
 async function rate(rating: Rating, direction?: { x: number, y: number }) {
   if (committed.value) {
     return
@@ -40,12 +62,19 @@ async function rate(rating: Rating, direction?: { x: number, y: number }) {
     const distance = Math.max(0, Math.min(horizontal, vertical))
     const x = origin.x + vector.x / length * distance
     const y = origin.y + vector.y / length * distance
-    const transform = `translate(${x}px, ${y}px) rotate(${Math.sign(x) * 24}deg)`
-    animation = element.animate([
-      { transform: `translate(${origin.x}px, ${origin.y}px) rotate(${origin.x / 25}deg)`, opacity: 1 },
-      { opacity: 1, offset: 0.35 },
-      { transform, opacity: 0 },
-    ], { duration: 360, easing: 'linear', fill: 'forwards' })
+    const restingBounds = stack.value!.getBoundingClientRect()
+    const frames = Array.from({ length: 21 }, (_, index) => {
+      const progress = index / 20
+      const frameX = origin.x + (x - origin.x) * progress
+      const frameY = origin.y + (y - origin.y) * progress
+      const rotation = origin.x / 25 + (Math.sign(x) * 24 - origin.x / 25) * progress
+      return {
+        offset: progress,
+        transform: `translate(${frameX}px, ${frameY}px) rotate(${rotation}deg)`,
+        opacity: opacityAt(frameX, frameY, restingBounds),
+      }
+    })
+    animation = element.animate(frames, { duration: 360, easing: 'linear', fill: 'forwards' })
     try {
       await animation.finished
     } catch {
@@ -134,7 +163,7 @@ function keydown(event: KeyboardEvent) {
           motion-reduce:transition-none
         "
         :class="[index === 0 ? 'study-card' : 'pointer-events-none', dragging && index === 0 ? 'cursor-grabbing transition-none' : 'cursor-grab transition-[transform,opacity] duration-240 ease-out']"
-        :style="{ zIndex: cards.length - index, transform: index === 0 ? `translate(${offset.x}px, ${offset.y}px) rotate(${offset.x / 25}deg)` : `translateY(${index * 10}px) rotate(${index === 1 ? 4 : -4}deg) scale(${1 - index * 0.025})` }"
+        :style="{ opacity: index === 0 ? opacity : 1, zIndex: cards.length - index, transform: index === 0 ? `translate(${offset.x}px, ${offset.y}px) rotate(${offset.x / 25}deg)` : `translateY(${index * 10}px) rotate(${index === 1 ? 4 : -4}deg) scale(${1 - index * 0.025})` }"
         :role="index === 0 ? 'button' : undefined"
         :tabindex="index === 0 ? 0 : -1"
         :inert="index !== 0"

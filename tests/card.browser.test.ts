@@ -53,6 +53,7 @@ it('returns short and cancelled drags without rating or revealing', async () => 
   await expect.element(card).toHaveAccessibleDescription('study.tapReveal')
   expect(rate).not.toHaveBeenCalled()
   expect((element as HTMLElement).style.transform).toBe('translate(0px, 0px) rotate(0deg)')
+  expect((element as HTMLElement).style.opacity).toBe('1')
 })
 
 it('supports focus, Space/Enter reveal, arrow keys and prevents held-key duplicate ratings', async () => {
@@ -140,6 +141,7 @@ it('continues from the release position, fades offscreen, and promotes the exist
   const exitX = Number(/translate\(([^p]+)px/.exec(String(frames.at(-1)!.transform))![1])
   // The first tenth of the exit travels a tenth of the distance: no ease-in pause.
   expect(earlyTransform.m41 - 110).toBeCloseTo((exitX - 110) * 0.1, 2)
+  expect(Number(getComputedStyle(element).opacity)).toBeLessThanOrEqual(Number(frames[0]!.opacity))
   animation.currentTime = 300
   expect(Number(getComputedStyle(element).opacity)).toBeLessThan(1)
   pointer(element, 'pointerdown', 150, 150)
@@ -182,4 +184,36 @@ it('rates immediately without animation when reduced motion is preferred', async
   } finally {
     media.mockRestore()
   }
+})
+
+it.each(['left', 'right', 'up', 'down'])('fades while dragging toward the %s edge and preserves transparency on release', async (direction) => {
+  const { card, rate } = await setup()
+  const element = card.element() as HTMLElement
+  vi.spyOn(element, 'setPointerCapture').mockImplementation(() => undefined)
+  // Standalone tests do not load the app's Tailwind sizing utilities.
+  element.style.height = '450px'
+  const bounds = element.parentElement!.parentElement!.getBoundingClientRect()
+  const horizontal = direction === 'left' || direction === 'right'
+  const sign = direction === 'left' || direction === 'up' ? -1 : 1
+  const size = horizontal ? bounds.width : bounds.height
+  const viewport = horizontal ? window.innerWidth : window.innerHeight
+  const center = horizontal ? bounds.left + size / 2 : bounds.top + size / 2
+  const edge = sign < 0 ? center : viewport - center
+  const start = Math.max(0, edge - viewport * 0.3)
+  const fadeDistance = edge + size / 2 - start
+  pointer(element, 'pointerdown', 150, 150)
+  pointer(element, 'pointermove', 150 + (horizontal ? sign * start : 0), 150 + (horizontal ? 0 : sign * start))
+  await expect.poll(() => Number(element.style.opacity)).toBe(1)
+  const halfway = sign * (start + fadeDistance / 2)
+  pointer(element, 'pointermove', 150 + (horizontal ? halfway : 0), 150 + (horizontal ? 0 : halfway))
+  await expect.poll(() => Number(element.style.opacity)).toBeCloseTo(0.5, 2)
+  const nearExit = sign * (start + fadeDistance * 0.9)
+  pointer(element, 'pointermove', 150 + (horizontal ? nearExit : 0), 150 + (horizontal ? 0 : nearExit))
+  await expect.poll(() => Number(element.style.opacity)).toBeCloseTo(0.1, 2)
+  pointer(element, 'pointerup', 150 + (horizontal ? nearExit : 0), 150 + (horizontal ? 0 : nearExit))
+  const animation = element.getAnimations()[0]!
+  animation.pause()
+  animation.currentTime = 0
+  expect(Number(getComputedStyle(element).opacity)).toBeCloseTo(0.1, 2)
+  expect(rate).not.toHaveBeenCalled()
 })
