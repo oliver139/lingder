@@ -4,6 +4,8 @@ Lingder is a planned language-learning web app with a dating-style flashcard int
 
 The repository currently contains the blank Nuxt 4 template; the learning features have not been implemented yet. The template was derived from the development setup of `oliver-personal-site`, with independent Git history.
 
+See [HANDOFF.md](HANDOFF.md) for the approved plan, current progress, remaining work, and commit strategy.
+
 ## Setup
 
 Use pnpm and the Node/pnpm versions declared in `package.json`. The runtime and package manager are downloaded automatically when needed.
