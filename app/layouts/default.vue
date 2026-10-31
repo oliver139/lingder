@@ -3,7 +3,7 @@ const localePath = useLocalePath()
 </script>
 
 <template>
-  <div class="overflow-clip">
+  <div class="overflow-clip selection:bg-violet-400/40 selection:text-highlighted">
     <div
       class="
         mx-auto max-w-[1260px] px-5
