@@ -51,9 +51,12 @@ function screen() {
 describe('study screen integration', () => {
   it('shows a stable loading placeholder before mounted initialization renders the deck', async () => {
     const wrapper = screen()
-    expect(wrapper.text()).toContain('Getting your cards ready')
+    expect(wrapper.get('[role="status"]').text()).toContain('Getting your cards ready')
+    expect(wrapper.get('[role="status"] [aria-hidden="true"]').exists()).toBe(true)
+    expect(wrapper.find('.study-card').exists()).toBe(false)
     await nextTick()
     expect(wrapper.find('.study-card').exists()).toBe(true)
+    expect(wrapper.text()).not.toContain('Getting your cards ready')
   })
 
   it('rates via buttons, undoes, restores mastery, and switches modes', async () => {

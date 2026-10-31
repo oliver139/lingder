@@ -54,7 +54,67 @@ async function undo() {
 
 <template>
   <div>
-    <div v-if="!store.ready" class="grid min-h-[65vh] place-content-center text-muted" role="status">{{ $t('study.loading') }}</div>
+    <div
+      v-if="!store.ready"
+      class="
+        flex min-h-[65vh] flex-col items-center justify-center
+        gap-9 px-4 py-12
+      "
+      role="status"
+      aria-live="polite"
+    >
+      <div class="relative isolate aspect-3/4 w-36 sm:w-40" aria-hidden="true">
+        <div
+          class="
+            absolute top-0 -z-20 h-4 w-full
+            animate-bounce [animation-delay:-0.8s] [animation-duration:2.4s]
+            motion-reduce:animate-none
+          "
+        >
+          <div
+            class="
+              aspect-3/4 w-full translate-x-3 translate-y-2 rotate-12
+              rounded-2xl border border-accented bg-stack
+            "
+          />
+        </div>
+        <div
+          class="
+            absolute top-0 -z-10 h-4 w-full
+            animate-bounce [animation-delay:-0.4s] [animation-duration:2.4s]
+            motion-reduce:animate-none
+          "
+        >
+          <div
+            class="
+              aspect-3/4 w-full -translate-x-2 translate-y-1 -rotate-6
+              rounded-2xl border border-default bg-elevated
+            "
+          />
+        </div>
+        <div
+          class="
+            absolute top-0 h-4 w-full animate-bounce
+            [animation-duration:2.4s]
+            motion-reduce:animate-none
+          "
+        >
+          <div
+            class="
+              flex aspect-3/4 w-full items-center justify-center
+              rounded-2xl border border-default bg-card shadow-card
+            "
+          >
+            <span class="animate-pulse text-5xl text-primary motion-reduce:animate-none">✦</span>
+          </div>
+        </div>
+      </div>
+      <p
+        class="animate-loading-text text-center text-sm text-muted motion-reduce:animate-none"
+      >
+        {{ $t('study.loading') }}
+      </p>
+    </div>
     <template v-else>
       <p v-if="storageWarning" class="mt-4 rounded-[0.7rem] bg-elevated p-4 text-sm" role="alert">{{ $t(`study.storage.${storageWarning}`) }}</p>
       <section class="pt-7 pb-5 text-center sm:pt-10 sm:pb-7">

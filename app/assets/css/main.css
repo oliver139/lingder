@@ -4,6 +4,13 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
+  --animate-loading-text: loading-text 2s ease-in-out infinite;
+
+  @keyframes loading-text {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.25; }
+  }
+
   --breakpoint-laptop: 64.0625rem;
   --breakpoint-desktop: 80.0625rem;
   --font-kana: "Noto Serif JP", serif;
