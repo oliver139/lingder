@@ -6,6 +6,11 @@
 @import "./tw-module/position.css";
 @import "./tw-module/variant.css";
 
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 500ms;
+}
+
 @theme {
   --font-sans: "Noto Sans", sans-serif;
 }
