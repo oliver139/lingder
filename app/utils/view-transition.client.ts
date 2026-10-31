@@ -1,12 +1,14 @@
 export function toggleDark(event: MouseEvent) {
   const colorMode = useColorMode()
-  const { width: windowW, height: windowH } = useWindowSize()
+  const windowW = window.innerWidth
+  const windowH = window.innerHeight
+  const nextPreference = colorMode.value === 'dark' ? 'light' : 'dark'
 
-  const isAppearanceTransition = document.startViewTransition
+  const isAppearanceTransition = typeof document.startViewTransition === 'function'
     && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
   if (!isAppearanceTransition) {
-    colorMode.preference = colorMode.preference === 'dark' ? 'light' : 'dark'
+    colorMode.preference = nextPreference
     return
   }
 
@@ -14,19 +16,19 @@ export function toggleDark(event: MouseEvent) {
   const x = (rect.right + rect.left) / 2
   const y = (rect.top + rect.bottom) / 2
   const rectEnlarge = [
-    y - windowH.value,
+    y - windowH,
     -x,
     -y,
-    x - windowW.value,
+    x - windowW,
   ]
   const rectShrink = [
     y,
-    windowW.value - x,
-    windowH.value - y,
+    windowW - x,
+    windowH - y,
     x,
   ]
   const transition = document.startViewTransition(async () => {
-    colorMode.preference = colorMode.preference === 'dark' ? 'light' : 'dark'
+    colorMode.preference = nextPreference
     await nextTick()
   })
   transition.ready

@@ -81,6 +81,15 @@ export default defineNuxtConfig({
     },
   },
 
+  fonts: {
+    provider: 'google',
+    families: [
+      { name: 'Noto Sans', weights: [400, 500, 600, 700], styles: ['normal'] },
+      { name: 'Noto Serif JP', weights: [400], styles: ['normal'], subsets: ['japanese', 'latin'] },
+      { name: 'Noto Serif TC', weights: [400], styles: ['normal'], subsets: ['chinese-traditional', 'latin'] },
+    ],
+  },
+
   i18n: {
     restructureDir: 'app/i18n',
     strategy: 'prefix_and_default',
