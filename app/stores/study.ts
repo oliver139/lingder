@@ -49,8 +49,13 @@ export const useStudyStore = defineStore('study', () => {
 
   function setSettings(settings: Partial<StudySettings>) {
     refreshDay()
-    progress.value.settings = { ...progress.value.settings, ...settings }
-    // Settings changes return to the daily session without losing extra totals.
+    const previous = progress.value.settings
+    const next = { ...previous, ...settings }
+    progress.value.settings = next
+    if (next.goal === previous.goal && next.script === previous.script && next.historical === previous.historical) {
+      return
+    }
+    // Only session-affecting settings return to the daily session.
     progress.value.session.extra = false
     progress.value.session = reconcileSession(saved.value.mode, progress.value, localDay())
     lastRating.value = null
@@ -80,7 +85,10 @@ export const useStudyStore = defineStore('study', () => {
     if (!lastRating.value || lastRating.value.mode !== saved.value.mode) {
       return
     }
-    saved.value.modes[lastRating.value.mode] = lastRating.value.progress
+    saved.value.modes[lastRating.value.mode] = {
+      ...lastRating.value.progress,
+      settings: { ...lastRating.value.progress.settings, reading: progress.value.settings.reading },
+    }
     lastRating.value = null
   }
 

@@ -112,6 +112,65 @@ describe('daily study store', () => {
     expect(store.lastRating).toBeNull()
   })
 
+  it.each([
+    ['ja', false, 'visible', 'reveal'],
+    ['ja', false, 'reveal', 'visible'],
+    ['ja', true, 'visible', 'reveal'],
+    ['ja', true, 'reveal', 'visible'],
+    ['tw', false, 'visible', 'reveal'],
+    ['tw', false, 'reveal', 'visible'],
+    ['tw', true, 'visible', 'reveal'],
+    ['tw', true, 'reveal', 'visible'],
+  ] as const)('preserves %s session and Undo (extra=%s) when reading changes from %s to %s', (mode, extra, from, to) => {
+    const store = initialized()
+    store.setMode(mode)
+    store.setSettings({ goal: 5, reading: from })
+    if (extra) {
+      finishDaily(store)
+      store.startExtra()
+    }
+    const originalSession = JSON.parse(JSON.stringify(store.progress.session))
+    const ratedId = store.current!.id
+    store.rate(ratedId, 'mastered')
+    const currentId = store.current!.id
+    const session = store.progress.session
+    const queue = [...session.queue]
+    const progressBeforeToggle = JSON.parse(JSON.stringify(session))
+    const undo = store.lastRating
+
+    // A full settings payload with unchanged session options is presentation-only too.
+    store.setSettings({ ...store.progress.settings, reading: to })
+    expect(store.progress.settings.reading).toBe(to)
+    expect(store.current!.id).toBe(currentId)
+    expect(store.progress.session).toBe(session)
+    expect(store.progress.session).toEqual(progressBeforeToggle)
+    expect(store.progress.session.queue).toEqual(queue)
+    expect(store.lastRating).toBe(undo)
+    expect(store.progress.mastered).toContain(ratedId)
+
+    store.undo()
+    expect(store.current!.id).toBe(ratedId)
+    expect(store.progress.session).toEqual(originalSession)
+    expect(store.progress.mastered).not.toContain(ratedId)
+    expect(store.progress.settings.reading).toBe(to)
+    expect(store.lastRating).toBeNull()
+  })
+
+  it('still reconciles extra practice when session settings change alongside reading mode', () => {
+    const store = initialized()
+    store.setSettings({ goal: 5 })
+    finishDaily(store)
+    store.startExtra()
+    store.rate(store.current!.id, 'review')
+    store.setSettings({ reading: 'reveal', goal: 10 })
+    expect(store.progress.settings.reading).toBe('reveal')
+    expect(store.progress.session.extra).toBe(false)
+    expect(store.progress.session.queue).toHaveLength(5)
+    expect(store.progress.session.completed).toHaveLength(5)
+    expect(store.progress.session.extraCompleted).toBe(1)
+    expect(store.lastRating).toBeNull()
+  })
+
   it('rolls over both modes at midnight, preserves mastery, and clears Undo', () => {
     const store = initialized()
     const id = store.current!.id
@@ -219,6 +278,23 @@ describe('storage boundary', () => {
     setActivePinia(createPinia())
     mountPersistence()
     expect(useStudyStore().progress.mastered).toContain(id)
+  })
+
+  it('persists reading changes without losing the extra-practice queue on reload', () => {
+    const { wrapper } = mountPersistence()
+    const store = useStudyStore()
+    store.setSettings({ goal: 5 })
+    finishDaily(store)
+    store.startExtra()
+    store.rate(store.current!.id, 'review')
+    const session = JSON.parse(JSON.stringify(store.progress.session))
+    store.setSettings({ reading: 'reveal' })
+    expect(decodeStudy(localStorage.getItem(STUDY_STORAGE_KEY)!)?.modes.ja.session).toEqual(session)
+    wrapper.unmount()
+    setActivePinia(createPinia())
+    mountPersistence()
+    expect(useStudyStore().progress.session).toEqual(session)
+    expect(useStudyStore().progress.settings.reading).toBe('reveal')
   })
 
   it('recovers corrupt data with a visible warning and handles denied storage', () => {
