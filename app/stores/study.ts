@@ -7,6 +7,10 @@ export const useStudyStore = defineStore('study', () => {
   const ready = shallowRef(false)
   const lastRating = shallowRef<{ mode: StudyMode, progress: ModeProgress } | null>(null)
   const progress = computed(() => saved.value.modes[saved.value.mode])
+  // Reclassify today's total against the current goal without rewriting rating history.
+  const studiedCount = computed(() => progress.value.session.completed.length + progress.value.session.extraCompleted)
+  const dailyCount = computed(() => Math.min(studiedCount.value, progress.value.settings.goal))
+  const extraCount = computed(() => Math.max(0, studiedCount.value - progress.value.settings.goal))
   const current = computed(() => {
     const id = progress.value.session.queue[0]
     for (const deck of studyDecks) {
@@ -110,5 +114,5 @@ export const useStudyStore = defineStore('study', () => {
     lastRating.value = null
   }
 
-  return { saved, ready, lastRating, progress, current, initialize, refreshDay, setMode, setSettings, rate, undo, restore, startExtra }
+  return { saved, ready, lastRating, progress, studiedCount, dailyCount, extraCount, current, initialize, refreshDay, setMode, setSettings, rate, undo, restore, startExtra }
 })

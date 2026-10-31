@@ -72,6 +72,32 @@ describe('study screen integration', () => {
     expect(wrapper.find('input[name="script"]').exists()).toBe(false)
   })
 
+  it('updates daily, extra and accessible progress totals when the goal changes', async () => {
+    const wrapper = screen()
+    await nextTick()
+    const store = useStudyStore()
+    store.setSettings({ goal: 20 })
+    while (store.current) {
+      store.rate(store.current.id, 'review')
+    }
+    store.startExtra()
+    while (store.current) {
+      store.rate(store.current.id, 'review')
+    }
+    await nextTick()
+    expect(wrapper.text()).toContain('Plus 20 extra practice cards')
+    await wrapper.findAll('input[name="goal"]')[0]!.setValue(true)
+    expect(wrapper.text()).toContain('5 / 5')
+    expect(wrapper.text()).not.toContain('20 / 5')
+    expect(wrapper.text()).toContain('Plus 35 extra practice cards')
+    expect(wrapper.get('progress').attributes('value')).toBe('5')
+    expect(wrapper.get('progress').attributes('max')).toBe('5')
+    expect(wrapper.get('[aria-atomic="true"]').text()).toContain('5 of 5 daily cards complete')
+    await wrapper.findAll('input[name="goal"]')[2]!.setValue(true)
+    expect(wrapper.text()).toContain('20 / 20')
+    expect(wrapper.text()).toContain('Plus 20 extra practice cards')
+  })
+
   it('updates settings, completes a goal and begins extra practice', async () => {
     const wrapper = screen()
     await nextTick()

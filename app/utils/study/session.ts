@@ -40,7 +40,8 @@ export function reconcileSession(mode: StudyMode, progress: ModeProgress, day: s
   const session = progress.session.day === day ? progress.session : emptySession(day)
   const seen = session.extra ? session.extraSeen : session.completed
   const eligible = eligibleIds(mode, progress).filter(id => !seen.includes(id))
-  const remaining = Math.max(0, progress.settings.goal - (session.extra ? session.extraSeen.length : session.completed.length))
+  const studied = session.completed.length + session.extraCompleted
+  const remaining = Math.max(0, progress.settings.goal - (session.extra ? session.extraSeen.length : studied))
   const retained = session.queue.filter(id => eligible.includes(id)).slice(0, remaining)
   const added = randomBatch(eligible.filter(id => !retained.includes(id)), remaining - retained.length)
   return { ...session, queue: [...retained, ...added] }

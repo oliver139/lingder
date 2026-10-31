@@ -165,10 +165,72 @@ describe('daily study store', () => {
     store.setSettings({ reading: 'reveal', goal: 10 })
     expect(store.progress.settings.reading).toBe('reveal')
     expect(store.progress.session.extra).toBe(false)
-    expect(store.progress.session.queue).toHaveLength(5)
+    expect(store.progress.session.queue).toHaveLength(4)
     expect(store.progress.session.completed).toHaveLength(5)
     expect(store.progress.session.extraCompleted).toBe(1)
     expect(store.lastRating).toBeNull()
+  })
+
+  it.each(['ja', 'tw'] as const)('reclassifies 40 studied cards against changing goals in %s without losing history', (mode) => {
+    const store = initialized()
+    store.setMode(mode)
+    store.setSettings({ goal: 20 })
+    finishDaily(store)
+    store.startExtra()
+    finishDaily(store)
+    const completed = [...store.progress.session.completed]
+    expect(store.studiedCount).toBe(40)
+    for (const [goal, daily, extra] of [[5, 5, 35], [10, 10, 30], [20, 20, 20], [5, 5, 35]] as const) {
+      store.setSettings({ goal })
+      expect(store.dailyCount).toBe(daily)
+      expect(store.extraCount).toBe(extra)
+      expect(store.studiedCount).toBe(40)
+      expect(store.current).toBeNull()
+      expect(store.progress.session.completed).toEqual(completed)
+      expect(store.progress.session.extraCompleted).toBe(20)
+    }
+    store.initialize(decodeStudy(JSON.stringify(store.saved)))
+    expect(store.dailyCount).toBe(5)
+    expect(store.extraCount).toBe(35)
+    store.startExtra()
+    const id = store.current!.id
+    store.rate(id, 'review')
+    expect(store.extraCount).toBe(36)
+    store.undo()
+    expect(store.extraCount).toBe(35)
+    expect(store.current!.id).toBe(id)
+    vi.setSystemTime(new Date(2026, 10, 1))
+    store.refreshDay()
+    expect(store.dailyCount).toBe(0)
+    expect(store.extraCount).toBe(0)
+  })
+
+  it('credits previous extra practice toward an increased goal and queues only the shortfall', () => {
+    const store = initialized()
+    store.setSettings({ goal: 5 })
+    finishDaily(store)
+    store.startExtra()
+    for (let i = 0; i < 3; i++) {
+      store.rate(store.current!.id, 'review')
+    }
+    expect(store.dailyCount).toBe(5)
+    expect(store.extraCount).toBe(3)
+    store.setSettings({ goal: 10 })
+    expect(store.dailyCount).toBe(8)
+    expect(store.extraCount).toBe(0)
+    expect(store.progress.session.queue).toHaveLength(2)
+    const id = store.current!.id
+    store.rate(id, 'mastered')
+    expect(store.dailyCount).toBe(9)
+    store.undo()
+    expect(store.dailyCount).toBe(8)
+    expect(store.current!.id).toBe(id)
+    finishDaily(store)
+    expect(store.dailyCount).toBe(10)
+    expect(store.extraCount).toBe(0)
+    store.setSettings({ goal: 5 })
+    expect(store.dailyCount).toBe(5)
+    expect(store.extraCount).toBe(5)
   })
 
   it('rolls over both modes at midnight, preserves mastery, and clears Undo', () => {
