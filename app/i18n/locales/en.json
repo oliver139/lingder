@@ -93,5 +93,10 @@
       "recordings": "Recording details ({count})",
       "source": "Original source"
     }
+  },
+  "audioTest": {
+    "title": "Pronunciation test",
+    "description": "Listen to every character, including historical kana. Playing another character stops the previous recording. Your study progress is unchanged.",
+    "play": "Play {script} {character} pronunciation"
   }
 }
