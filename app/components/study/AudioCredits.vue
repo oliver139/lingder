@@ -4,7 +4,7 @@ import { pronunciationGroups } from '../../data/audio'
 
 <template>
   <UModal :title="$t('study.audio.credits')" :description="$t('study.audio.creditsDescription')" :ui="{ content: 'max-w-2xl', body: 'max-h-[65dvh] overflow-y-auto' }">
-    <UButton color="neutral" variant="link" class="p-0 text-[0.65rem]" :label="$t('study.audio.credits')" />
+    <UButton color="neutral" variant="link" class="cursor-pointer p-0 text-[0.65rem]" :label="$t('study.audio.credits')" />
     <template #body>
       <div class="space-y-6">
         <section v-for="group in pronunciationGroups" :key="group.mode" class="space-y-3">
