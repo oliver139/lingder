@@ -1,0 +1,12 @@
+{
+  "extends": "../.nuxt/tsconfig.app.json",
+  "compilerOptions": {
+    "types": ["node", "vite/client"]
+  },
+  "include": [
+    "../.nuxt/nuxt.d.ts",
+    "../app/**/*.vue",
+    "../vitest.config.ts",
+    "./**/*.ts"
+  ]
+}

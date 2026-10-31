@@ -1,0 +1,15 @@
+{
+  "app": {
+    "theme": {
+      "name": {
+        "light": "light mode",
+        "dark": "dark mode"
+      },
+      "switch": {
+        "theme": "Switch theme",
+        "light": "Switch to @:app.theme.name.light",
+        "dark": "Switch to @:app.theme.name.dark"
+      }
+    }
+  }
+}

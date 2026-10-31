@@ -1,0 +1,8 @@
+@utility grid-col-auto-fill-* {
+  grid-template-columns: repeat(auto-fill, minmax(min(--spacing(--value(number)), 100%), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(--value([length]), 100%), 1fr));
+}
+@utility grid-col-auto-fit-* {
+  grid-template-columns: repeat(auto-fit, minmax(min(--spacing(--value(number)), 100%), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(--value([length]), 100%), 1fr));
+}

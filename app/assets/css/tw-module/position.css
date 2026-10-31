@@ -1,0 +1,47 @@
+@utility middle {
+  @apply top-1/2 -translate-y-1/2;
+}
+@utility center {
+  @apply left-1/2 -translate-x-1/2;
+}
+
+@utility left-middle-full {
+  @apply top-1/2 left-full -translate-y-1/2;
+}
+@utility right-middle-full {
+  @apply top-1/2 right-full -translate-y-1/2;
+} 
+@utility top-center-full {
+  @apply top-1/2 left-full -translate-x-1/2;
+}
+@utility bottom-center-full {
+  @apply bottom-1/2 left-full -translate-x-1/2;
+}
+@utility left-middle-* {
+  top: 50%;
+  left: --spacing(--value(number));
+  left: calc(--value(ratio) * 100%);
+  left: --value([length], [percentage]);
+  translate: 0 -50%;
+}
+@utility right-middle-* {
+  top: 50%;
+  right: --spacing(--value(number));
+  right: calc(--value(ratio) * 100%);
+  right: --value([length], [percentage]);
+  translate: 0 -50%;
+}
+@utility top-center-* {
+  left: 50%;
+  top: --spacing(--value(number));
+  top: calc(--value(ratio) * 100%);
+  top: --value([length], [percentage]);
+  translate: -50% 0;
+}
+@utility bottom-center-* {
+  left: 50%;
+  bottom: --spacing(--value(number));
+  bottom: calc(--value(ratio) * 100%);
+  bottom: --value([length], [percentage]);
+  translate: -50% 0;
+}

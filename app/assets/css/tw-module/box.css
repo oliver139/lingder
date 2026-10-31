@@ -1,0 +1,65 @@
+@utility pxt-* {
+  padding-top: --spacing(--value(number));
+  padding-top: --value([length], [percentage]);
+  padding-left: --spacing(--value(number));
+  padding-left: --value([length], [percentage]);
+  padding-right: --spacing(--value(number));
+  padding-right: --value([length], [percentage]);
+}
+@utility pxb-* {
+  padding-bottom: --spacing(--value(number));
+  padding-bottom: --value([length], [percentage]);
+  padding-left: --spacing(--value(number));
+  padding-left: --value([length], [percentage]);
+  padding-right: --spacing(--value(number));
+  padding-right: --value([length], [percentage]);
+}
+@utility pyl-* {
+  padding-top: --spacing(--value(number));
+  padding-top: --value([length], [percentage]);
+  padding-bottom: --spacing(--value(number));
+  padding-bottom: --value([length], [percentage]);
+  padding-left: --spacing(--value(number));
+  padding-left: --value([length], [percentage]);
+}
+@utility pyr-* {
+  padding-top: --spacing(--value(number));
+  padding-top: --value([length], [percentage]);
+  padding-bottom: --spacing(--value(number));
+  padding-bottom: --value([length], [percentage]);
+  padding-right: --spacing(--value(number));
+  padding-right: --value([length], [percentage]);
+}
+
+@utility mxt-* {
+  margin-top: --spacing(--value(number));
+  margin-top: --value([length], [percentage]);
+  margin-left: --spacing(--value(number));
+  margin-left: --value([length], [percentage]);
+  margin-right: --spacing(--value(number));
+  margin-right: --value([length], [percentage]);
+}
+@utility mxb-* {
+  margin-bottom: --spacing(--value(number));
+  margin-bottom: --value([length], [percentage]);
+  margin-left: --spacing(--value(number));
+  margin-left: --value([length], [percentage]);
+  margin-right: --spacing(--value(number));
+  margin-right: --value([length], [percentage]);
+}
+@utility myl-* {
+  margin-top: --spacing(--value(number));
+  margin-top: --value([length], [percentage]);
+  margin-bottom: --spacing(--value(number));
+  margin-bottom: --value([length], [percentage]);
+  margin-left: --spacing(--value(number));
+  margin-left: --value([length], [percentage]);
+}
+@utility myr-* {
+  margin-top: --spacing(--value(number));
+  margin-top: --value([length], [percentage]);
+  margin-bottom: --spacing(--value(number));
+  margin-bottom: --value([length], [percentage]);
+  margin-right: --spacing(--value(number));
+  margin-right: --value([length], [percentage]);
+}
