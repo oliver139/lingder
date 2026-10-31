@@ -9,6 +9,7 @@ const { t } = useI18n()
 const announcement = shallowRef('')
 const cardStack = useTemplateRef('cardStack')
 const animating = shallowRef(false)
+const switchingMode = shallowRef(false)
 const upcoming = computed(() => store.progress.session.queue.slice(1, 3).flatMap(id =>
   studyDecks.flatMap(deck => deck.cards.filter(card => card.id === id).map(card => ({ ...card, deck }))),
 ))
@@ -122,19 +123,38 @@ function undo() {
           :aria-label="$t('study.practice')"
         >
           <div class="mb-4 flex justify-between text-[0.7rem] text-muted"><span>{{ $t(session.extra ? 'study.extraPractice' : 'study.dailySession') }}</span><span>{{ $t('study.remaining', { count: session.queue.length }) }}</span></div>
-          <StudyCard
-            v-if="store.current"
-            ref="cardStack"
-            :upcoming="upcoming"
-            :card="store.current"
-            :deck="store.current.deck"
-            :reading-display="store.progress.settings.reading"
-            @rate="rate"
-            @busy="animating = $event"
-          />
-          <StudyComplete v-else :exhausted="exhausted" :extra="session.extra" @practice="store.startExtra" />
+          <Transition
+            mode="out-in"
+            enter-active-class="transition-opacity duration-150 ease-in motion-reduce:transition-none motion-reduce:duration-0"
+            enter-from-class="opacity-0"
+            enter-to-class="opacity-100"
+            leave-active-class="transition-opacity duration-150 ease-out motion-reduce:transition-none motion-reduce:duration-0"
+            leave-from-class="opacity-100"
+            leave-to-class="opacity-0"
+            @before-leave="element => {
+              switchingMode = true; element.setAttribute('inert', '')
+            }"
+            @before-enter="element => element.setAttribute('inert', '')"
+            @after-enter="element => {
+              switchingMode = false; element.removeAttribute('inert')
+            }"
+          >
+            <div :key="store.saved.mode">
+              <StudyCard
+                v-if="store.current"
+                ref="cardStack"
+                :upcoming="upcoming"
+                :card="store.current"
+                :deck="store.current.deck"
+                :reading-display="store.progress.settings.reading"
+                @rate="rate"
+                @busy="animating = $event"
+              />
+              <StudyComplete v-else :exhausted="exhausted" :extra="session.extra" @practice="store.startExtra" />
+            </div>
+          </Transition>
           <p id="card-help" class="mt-14 mb-6 text-center text-xs text-muted">{{ $t('study.gestureHint') }}</p>
-          <RatingControls :disabled="!store.current || animating" :can-undo="canUndo && !animating" @rate="rateCurrent" @undo="undo" />
+          <RatingControls :disabled="!store.current || animating || switchingMode" :can-undo="canUndo && !animating && !switchingMode" @rate="rateCurrent" @undo="undo" />
           <p class="mt-4 text-center text-[0.65rem] leading-[1.7] text-muted">{{ $t('study.keyboardHint') }} <span v-if="store.progress.settings.reading === 'reveal'">{{ $t('study.keyboardRevealHint') }}</span></p>
           <p class="sr-only" role="status" aria-live="polite" aria-atomic="true">{{ announcement }} {{ $t('study.progressAnnouncement', { count: store.dailyCount, goal: store.progress.settings.goal, percent: dailyPercent }) }}</p>
         </section>
