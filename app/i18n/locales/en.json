@@ -104,6 +104,19 @@
   "audioTest": {
     "title": "Pronunciation Table",
     "description": "Listen to every character, including historical kana. Playing another character stops the previous recording. Your study progress is unchanged.",
-    "play": "Play {script} {character} pronunciation"
+    "play": "Play {script} {character} pronunciation",
+    "rows": {
+      "vowels": "Vowels",
+      "k": "K row",
+      "s": "S row",
+      "t": "T row",
+      "n": "N row",
+      "h": "H row",
+      "m": "M row",
+      "y": "Y row",
+      "r": "R row",
+      "w": "W row",
+      "nasal": "Syllabic N"
+    }
   }
 }
