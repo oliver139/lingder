@@ -99,7 +99,7 @@ export default defineNuxtConfig({
     locales: [
       { code: 'en', name: 'English', file: 'en.json', language: 'en', nuxtUiCode: 'en' },
       { code: 'zh', name: '繁體中文', file: 'zh.json', language: 'zh-Hant', nuxtUiCode: 'zh_tw' },
-      // { code: 'ja', name: '日本語', file: 'ja.json', language: 'ja', nuxtUiCode: 'ja' },
+      { code: 'ja', name: '日本語', file: 'ja.json', language: 'ja', nuxtUiCode: 'ja' },
     ],
     detectBrowserLanguage: {
       useCookie: true,

@@ -1,1 +1,125 @@
-{}
+{
+  "app": {
+    "theme": {
+      "name": {
+        "light": "ライトモード",
+        "dark": "ダークモード"
+      },
+      "switch": {
+        "theme": "テーマを切り替える",
+        "light": "@:app.theme.name.light に切り替える",
+        "dark": "@:app.theme.name.dark に切り替える"
+      }
+    },
+    "navigation": {
+      "label": "メインナビゲーション",
+      "cards": "カード",
+      "table": "発音表"
+    },
+    "language": "表示言語"
+  },
+  "study": {
+    "brand": "Lingder",
+    "home": "Lingder ホーム",
+    "smallSteps": "小さな一歩から、新しい出会いへ。",
+    "eyebrow": "毎日、少しずつ",
+    "title": "次の文字を",
+    "titleAccent": "覚えよう。",
+    "subtitle": "毎日の小さな習慣で、読む世界が広がる。",
+    "mode": "学習する言語",
+    "modeName": {
+      "ja": "日本語",
+      "tw": "台湾の注音符号"
+    },
+    "hiragana": "ひらがな",
+    "katakana": "カタカナ",
+    "zhuyin": "注音符号",
+    "both": "両方",
+    "loading": "カードを準備しています…",
+    "yourRhythm": "毎日の学習ペース",
+    "todayCount": "今日学習したカード",
+    "dailyProgress": "今日の学習進捗",
+    "extraCount": "追加練習でさらに {count} 枚",
+    "dailySession": "今日のカード",
+    "extraPractice": "追加練習",
+    "remaining": "残り {count} 枚",
+    "practice": "カード練習",
+    "cardLabel": "{script}のカード：{prompt}",
+    "historicalBadge": "歴史的な仮名",
+    "tapReveal": "タップして読み方を表示",
+    "takeYourTime": "焦らず、じっくり覚えよう。",
+    "revealHint": "スペースキーや Enter キーでも読み方を表示できます",
+    "review": "あとで復習",
+    "mastered": "覚えた",
+    "undo": "前の回答を取り消す",
+    "gestureHint": "← → あとで復習 · ↑ ↓ 覚えた",
+    "keyboardHint": "カードをクリックすると、矢印キーで操作できます。",
+    "keyboardRevealHint": "スペースキー / Enter キーで読み方を表示。",
+    "settings": "自分に合った学び方に",
+    "scripts": "練習する仮名",
+    "includeHistorical": "歴史的な仮名を含める（ゐ / ゑ / ヰ / ヱ）",
+    "dailyGoal": "この言語の1日の目標",
+    "goalOption": "{count} 枚",
+    "readingDisplay": "読み方の表示",
+    "readingOption": {
+      "visible": "常に表示",
+      "reveal": "タップして表示"
+    },
+    "settingsHint": "変更はすぐに反映されます。今日の学習実績はそのまま残ります。",
+    "collection": "覚えたカード",
+    "collectionHint": "一文字覚えるたびに、小さな一歩。カードを戻すと、もう一度練習できます。",
+    "collectionEmpty": "初めて覚えたカードが、ここに表示されます。",
+    "restore": "練習に戻す",
+    "restoreLabel": "{script}の{prompt}を練習に戻す",
+    "completeTitle": "少し、なじんできたね。",
+    "extraComplete": "また一歩、前に進めたね。",
+    "completeHint": "このカードセットは完了です。また明日、あるいはもう少し続けてみましょう。",
+    "exhaustedTitle": "すべて覚えました。",
+    "exhaustedHint": "選択中の文字はすべて習得済みです。カードを戻すか、別の文字を選んで練習しましょう。",
+    "noteTitle": "親しみは、最初の出会いから。",
+    "noteBody": "急がなくても、満点でなくても大丈夫。目の前の文字に、少しだけ好奇心を向けてみよう。",
+    "reviewHint": "「あとで復習」を選んだカードは、今後のランダムな練習にも登場します。",
+    "footer": "ちょっとした時間に、少しずつ学ぼう",
+    "localOnly": "学習進捗はこのブラウザー内に保存されます。",
+    "ratedMastered": "覚えたカードとして記録しました。",
+    "ratedReview": "あとで復習するカードとして記録しました。",
+    "undone": "前の回答を取り消しました。",
+    "progressAnnouncement": "今日の目標 {goal} 枚のうち、{count} 枚が完了しました。",
+    "storage": {
+      "unavailable": "現在、このブラウザーでは進捗を保存できません。学習は続けられますが、ページを離れると変更が失われる場合があります。",
+      "invalid": "保存された進捗を読み込めなかったため、新しい練習を開始しました。"
+    },
+    "audio": {
+      "play": "発音を再生",
+      "revealFirst": "読み方を表示すると発音を聞けます",
+      "error": "音声を再生できませんでした。スピーカーをタップして再試行してください。",
+      "credits": "音声の出典・ライセンス",
+      "creditsDescription": "Lingder の発音音声の出典、制作者、ライセンス情報です。",
+      "processing": "録音の前後の無音部分をトリミングし、音量の正規化とピーク制限を行い、モノラル MP3 に変換しています。",
+      "recordings": "録音の詳細（{count} 件）",
+      "source": "元の出典",
+      "japaneseCredit": "現代仮名の録音は FUN Japanese Learning が制作したものです。kana-trainer を通じて入手し、CC BY 4.0 に基づいて使用しています。",
+      "japaneseProcessing": "現代仮名の MP3 ファイル46件は変更せずに使用しています。歴史的な仮名 wi と we は、Wikimedia のパブリックドメイン録音を引き続き使用し、無音部分のトリミング、音量の正規化、ピーク制限、MP3 への変換を行っています。",
+      "zhuyinCredit": "2017 © 台湾教育部『国語注音符号ハンドブック』公開素材。",
+      "zhuyinLicense": "この素材は、クリエイティブ・コモンズ 表示 4.0 国際ライセンスに基づいて公開されています。同ライセンスのすべての条件を遵守することを条件に利用できます。"
+    }
+  },
+  "audioTest": {
+    "title": "発音表",
+    "description": "歴史的な仮名を含む、すべての文字の発音を聞けます。別の文字を再生すると、前の音声は停止します。学習進捗には影響しません。",
+    "play": "{script}の{character}の発音を再生",
+    "rows": {
+      "vowels": "母音（あ行）",
+      "k": "か行",
+      "s": "さ行",
+      "t": "た行",
+      "n": "な行",
+      "h": "は行",
+      "m": "ま行",
+      "y": "や行",
+      "r": "ら行",
+      "w": "わ行",
+      "nasal": "撥音（ん）"
+    }
+  }
+}

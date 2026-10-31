@@ -15,7 +15,8 @@
       "label": "Main navigation",
       "cards": "Cards",
       "table": "Table"
-    }
+    },
+    "language": "Interface language"
   },
   "study": {
     "brand": "Lingder",

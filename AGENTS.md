@@ -81,7 +81,7 @@ Only commit when the user explicitly asks; do not commit automatically. When com
 - Use only the installed `bx`, `lucide`, and `ri` icon collections. Ask the user for confirmation before adding another icon pack.
 - Load Google Noto fonts through Nuxt Fonts: sans-serif families for interface text and language-appropriate serif families for flashcard characters. Preserve Japanese and Traditional Chinese glyph coverage.
 - Use Valibot when form validation is needed. Fixed-choice settings do not require a validation dependency by themselves.
-- Active locales are English (`en`, default) and Traditional Chinese (`zh`, language `zh-Hant`). Japanese (`ja`) remains commented out in the Nuxt configuration with an empty locale file ready to enable.
+- Active locales are English (`en`, default), Traditional Chinese (`zh`, language `zh-Hant`), and Japanese (`ja`). Keep their locale files and Nuxt UI locale mappings aligned.
 - Put user-facing copy in locale files. Add English first and use English fallback until translations are requested.
 - Use `<NuxtLinkLocale>` from `@nuxtjs/i18n` for internal page links, passing unlocalized paths or route names directly instead of wrapping `<NuxtLink>` destinations in `localePath()`. Use ordinary anchors for external URLs. Preserve `prefix_and_default` routing and reactive `useLocaleHead()` metadata. When custom active-link handling is needed across prefixed and unprefixed URLs, use `custom` with `useRouteBaseName(route)`.
 - Public metadata uses `SITE_NAME`, `SITE_DESC`, `SITE_URL`, and `SITE_IMG`. Document safe examples in `.env.example`; keep local environment files ignored and never put secrets in public metadata.
