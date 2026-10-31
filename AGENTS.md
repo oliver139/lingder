@@ -46,6 +46,8 @@ Use **pnpm only**. Follow `package.json` runtime and package manager settings. P
 - `pnpm test:all`: run both test projects once.
 - `pnpm build`, `pnpm generate`, `pnpm preview`: production workflows.
 
+The user manages development servers manually. Do not start or restart a dev server unless explicitly asked. Use an existing server for browser checks when available; if none is running, report that browser verification needs a user-started server. Stop project dev servers when requested.
+
 Use `pnpm install --frozen-lockfile` in CI. Commit lockfile changes with intentional dependency changes. Dependency updaters can write files; do not run them as routine validation.
 
 ## Planning and approval
