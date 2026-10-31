@@ -7,7 +7,7 @@ const props = defineProps<{
   upcoming?: (StudyCard & { deck: StudyDeck })[]
   readingDisplay: 'visible' | 'reveal'
 }>()
-const emit = defineEmits<{ rate: [id: string, rating: Rating], busy: [value: boolean] }>()
+const emit = defineEmits<{ rate: [id: string, rating: Rating, exit?: { x: number, y: number }], busy: [value: boolean] }>()
 const stack = useTemplateRef<HTMLElement>('stack')
 const surface = shallowRef<HTMLElement | null>(null)
 let animation: Animation | undefined
@@ -50,6 +50,7 @@ async function rate(rating: Rating, direction?: { x: number, y: number }) {
   emit('busy', true)
   const id = props.card.id
   const element = surface.value
+  let exit: { x: number, y: number } | undefined
   if (element?.animate && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     const origin = { ...offset.value }
     const vector = direction ?? (Math.hypot(origin.x, origin.y) ? origin : rating === 'review' ? { x: 1, y: 0 } : { x: 0, y: -1 })
@@ -62,6 +63,7 @@ async function rate(rating: Rating, direction?: { x: number, y: number }) {
     const distance = Math.max(0, Math.min(horizontal, vertical))
     const x = origin.x + vector.x / length * distance
     const y = origin.y + vector.y / length * distance
+    exit = { x, y }
     const restingBounds = stack.value!.getBoundingClientRect()
     const frames = Array.from({ length: 21 }, (_, index) => {
       const progress = index / 20
@@ -82,7 +84,42 @@ async function rate(rating: Rating, direction?: { x: number, y: number }) {
     }
   }
   if (props.card.id === id) {
-    emit('rate', id, rating)
+    emit('rate', id, rating, exit)
+  }
+}
+
+async function returnCard(exit?: { x: number, y: number }) {
+  const element = surface.value
+  if (!element?.animate || !stack.value || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    return
+  }
+  animation?.cancel()
+  committed.value = true
+  emit('busy', true)
+  const bounds = stack.value.getBoundingClientRect()
+  const origin = exit ?? { x: -bounds.right - bounds.width, y: 0 }
+  const frames = Array.from({ length: 21 }, (_, index) => {
+    const progress = index / 20
+    const x = origin.x * (1 - progress)
+    const y = origin.y * (1 - progress)
+    return {
+      offset: progress,
+      transform: `translate(${x}px, ${y}px) rotate(${Math.sign(origin.x) * 24 * (1 - progress)}deg)`,
+      opacity: opacityAt(x, y, bounds),
+    }
+  })
+  const returning = element.animate(frames, { duration: 300, easing: 'ease-out', fill: 'both' })
+  animation = returning
+  try {
+    await returning.finished
+  } catch {
+    return
+  }
+  if (animation === returning) {
+    returning.cancel()
+    animation = undefined
+    committed.value = false
+    emit('busy', false)
   }
 }
 
@@ -109,7 +146,7 @@ onBeforeUnmount(() => {
   animation?.cancel()
   emit('busy', false)
 })
-defineExpose({ rate })
+defineExpose({ rate, returnCard })
 
 watch(() => props.readingDisplay, () => {
   revealed.value = false

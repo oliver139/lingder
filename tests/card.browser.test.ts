@@ -1,12 +1,13 @@
 import { afterEach, expect, it, vi } from 'vitest'
 import { render } from 'vitest-browser-vue'
 import { page, userEvent } from 'vitest/browser'
+import { defineComponent, nextTick, shallowRef } from 'vue'
 import StudyCard from '@/components/study/StudyCard.vue'
 import { useCardGesture } from '@/composables/useCardGesture'
 import { studyDecks } from '@/data/decks'
 
 vi.stubGlobal('useCardGesture', useCardGesture)
-afterEach(() => vi.clearAllMocks())
+afterEach(() => vi.restoreAllMocks())
 
 async function setup() {
   const rate = vi.fn()
@@ -36,7 +37,7 @@ it.each([
   pointer(element, 'pointermove', 150 + x, 150 + y)
   pointer(element, 'pointerup', 150 + x, 150 + y)
   pointer(element, 'pointerup', 150 + x, 150 + y)
-  await expect.poll(() => rate.mock.calls).toEqual([['ja-hiragana-a', rating]])
+  await expect.poll(() => rate.mock.calls.map(call => call.slice(0, 2))).toEqual([['ja-hiragana-a', rating]])
 })
 
 it('returns short and cancelled drags without rating or revealing', async () => {
@@ -64,7 +65,7 @@ it('supports focus, Space/Enter reveal, arrow keys and prevents held-key duplica
   await expect.element(page.getByText('a', { exact: true })).toBeVisible()
   await userEvent.keyboard('{ArrowRight}')
   await userEvent.keyboard('{ArrowUp}')
-  await expect.poll(() => rate.mock.calls).toEqual([['ja-hiragana-a', 'review']])
+  await expect.poll(() => rate.mock.calls.map(call => call.slice(0, 2))).toEqual([['ja-hiragana-a', 'review']])
 })
 
 it('reveals with a real pointer click and resets reading for the next card', async () => {
@@ -86,7 +87,7 @@ it.each([
   const { card, rate } = await setup()
   await card.click()
   await userEvent.keyboard(`{${key}}`)
-  await expect.poll(() => rate.mock.calls).toEqual([['ja-hiragana-a', rating]])
+  await expect.poll(() => rate.mock.calls.map(call => call.slice(0, 2))).toEqual([['ja-hiragana-a', rating]])
   await expect.element(card).toHaveFocus()
 })
 
@@ -148,7 +149,7 @@ it('continues from the release position, fades offscreen, and promotes the exist
   pointer(element, 'pointerup', 150, 280)
   expect(rate).not.toHaveBeenCalled()
   animation.finish()
-  await expect.poll(() => rate.mock.calls).toEqual([['ja-hiragana-a', 'review']])
+  await expect.poll(() => rate.mock.calls.map(call => call.slice(0, 2))).toEqual([['ja-hiragana-a', 'review']])
   const finalTransform = new DOMMatrix(getComputedStyle(element).transform)
   expect(finalTransform.m41).toBeGreaterThan(window.innerWidth)
   expect(Number(getComputedStyle(element).opacity)).toBe(0)
@@ -179,7 +180,7 @@ it('rates immediately without animation when reduced motion is preferred', async
   try {
     const { card, rate } = await setup()
     card.element().dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }))
-    expect(rate).toHaveBeenCalledExactlyOnceWith('ja-hiragana-a', 'mastered')
+    expect(rate).toHaveBeenCalledExactlyOnceWith('ja-hiragana-a', 'mastered', undefined)
     expect(card.element().getAnimations()).toHaveLength(0)
   } finally {
     media.mockRestore()
@@ -233,8 +234,59 @@ it('prevents native selection dragging from taking over a card swipe', async () 
     expect(selection.toString()).toBe(selectedText)
     pointer(element, 'pointermove', 260, 150)
     pointer(element, 'pointerup', 260, 150)
-    await expect.poll(() => rate.mock.calls).toEqual([['ja-hiragana-a', 'review']])
+    await expect.poll(() => rate.mock.calls.map(call => call.slice(0, 2))).toEqual([['ja-hiragana-a', 'review']])
   } finally {
     selection.removeAllRanges()
   }
+})
+
+it.each([
+  { completed: false, reduced: false },
+  { completed: true, reduced: false },
+  { completed: false, reduced: true },
+  { completed: true, reduced: true },
+])('returns an undone card (completed: $completed, reduced motion: $reduced)', async ({ completed, reduced }) => {
+  const matchMedia = window.matchMedia.bind(window)
+  vi.spyOn(window, 'matchMedia').mockImplementation(query => ({ ...matchMedia(query), matches: reduced }))
+  const deck = studyDecks[0]!
+  const fixture = defineComponent({
+    components: { StudyCard },
+    setup() {
+      const index = shallowRef<number | null>(completed ? null : 1)
+      const stack = shallowRef<InstanceType<typeof StudyCard> | null>(null)
+      const busy = shallowRef(false)
+      async function undo() {
+        index.value = 0
+        await nextTick()
+        stack.value?.returnCard({ x: -1200, y: 0 })
+      }
+      return { deck, index, stack, busy, undo }
+    },
+    template: '<StudyCard v-if="index !== null" ref="stack" :card="deck.cards[index]" :deck="deck" :upcoming="deck.cards.slice(index + 1, index + 3).map(card => ({ ...card, deck }))" reading-display="visible" @busy="busy = $event" /><button :disabled="busy" @click="undo">Undo</button>',
+  })
+  await render(fixture, { global: { mocks: { $t: (key: string) => key } } })
+  const next = document.querySelector(`[data-card-id="${deck.cards[1]!.id}"]`)
+  await page.getByRole('button', { name: 'Undo', exact: true }).click()
+  const restored = document.querySelector(`[data-card-id="${deck.cards[0]!.id}"]`) as HTMLElement
+  const animation = restored.getAnimations().find(animation => animation.effect?.getTiming().duration === 300)!
+  if (reduced) {
+    expect(animation).toBeUndefined()
+    expect(restored.getAttribute('aria-disabled')).toBe('false')
+    expect(new DOMMatrix(getComputedStyle(restored).transform).m41).toBe(0)
+    return
+  }
+  animation.pause()
+  animation.currentTime = 0
+  expect(new DOMMatrix(getComputedStyle(restored).transform).m41).toBe(-1200)
+  expect(Number(getComputedStyle(restored).opacity)).toBe(0)
+  expect(restored.getAttribute('aria-disabled')).toBe('true')
+  if (next) {
+    expect(document.querySelector(`[data-card-id="${deck.cards[1]!.id}"]`)).toBe(next)
+  }
+  animation.currentTime = 250
+  expect(new DOMMatrix(getComputedStyle(restored).transform).m41).toBeGreaterThan(-1200)
+  animation.finish()
+  await expect.element(page.getByRole('button', { name: 'Undo', exact: true })).toBeEnabled()
+  expect(new DOMMatrix(getComputedStyle(restored).transform).m41).toBe(0)
+  expect(Number(getComputedStyle(restored).opacity)).toBe(1)
 })
