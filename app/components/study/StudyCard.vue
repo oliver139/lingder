@@ -156,7 +156,17 @@ function keydown(event: KeyboardEvent) {
           <span v-else aria-hidden="true">✦</span>
         </div>
         <span class="card-character block text-[clamp(5rem,20vw,7rem)] leading-[1.7]" :class="item.deck.fontFamily === 'kana' ? 'font-kana' : 'font-zhuyin'" :lang="item.deck.language">{{ item.prompt }}</span>
-        <span :id="index === 0 ? 'card-reading' : undefined" :class="item.showReading ? 'font-serif text-[1.6rem]' : 'my-1.5 text-base text-primary'" lang="en" aria-live="polite">{{ item.showReading ? item.reading : $t('study.tapReveal') }}</span>
+        <span :id="index === 0 ? 'card-reading' : undefined" class="grid min-h-10 place-items-center" lang="en" aria-live="polite">
+          <span
+            class="
+              font-serif text-[1.6rem] transition-[filter] duration-250
+              motion-reduce:transition-none motion-reduce:duration-0
+            "
+            :class="item.showReading ? 'blur-none' : 'blur-[6px]'"
+            :aria-hidden="!item.showReading"
+          >{{ item.reading }}</span>
+          <span v-if="!item.showReading" class="sr-only">{{ $t('study.tapReveal') }}</span>
+        </span>
         <span class="mt-auto pt-4 text-[0.7rem] text-muted">{{ $t(item.showReading ? 'study.takeYourTime' : 'study.revealHint') }}</span>
       </div>
     </TransitionGroup>

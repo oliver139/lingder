@@ -50,7 +50,7 @@ it('returns short and cancelled drags without rating or revealing', async () => 
   pointer(element, 'pointermove', 270, 150)
   pointer(element, 'pointercancel', 270, 150)
   pointer(element, 'pointerup', 270, 150)
-  await expect.element(page.getByText('study.tapReveal')).toBeVisible()
+  await expect.element(card).toHaveAccessibleDescription('study.tapReveal')
   expect(rate).not.toHaveBeenCalled()
   expect((element as HTMLElement).style.transform).toBe('translate(0px, 0px) rotate(0deg)')
 })
@@ -71,7 +71,7 @@ it('reveals with a real pointer click and resets reading for the next card', asy
   await card.click()
   await expect.element(page.getByText('a', { exact: true })).toBeVisible()
   await screen.rerender({ card: studyDecks[0]!.cards[1]! })
-  await expect.element(page.getByText('study.tapReveal')).toBeVisible()
+  await expect.element(card).toHaveAccessibleDescription('study.tapReveal')
   await userEvent.keyboard('{Enter}')
   await expect.element(page.getByText('i', { exact: true })).toBeVisible()
 })
@@ -110,8 +110,12 @@ it('ignores secondary pointers, lost capture, held keys and detached elements', 
 it('exposes the revealed reading as an accessible description', async () => {
   const { card } = await setup()
   await expect.element(card).toHaveAccessibleDescription('study.tapReveal')
+  const reading = card.element().querySelector('#card-reading > span')!
+  expect(reading.textContent).toBe('a')
+  expect(reading.getAttribute('aria-hidden')).toBe('true')
   await card.click()
   await expect.element(card).toHaveAccessibleDescription('a')
+  expect(reading.getAttribute('aria-hidden')).toBe('false')
 })
 
 it('continues from the release position, fades offscreen, and promotes the existing next card', async () => {

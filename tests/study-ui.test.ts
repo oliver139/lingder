@@ -77,8 +77,13 @@ describe('study screen integration', () => {
     await nextTick()
     await wrapper.findAll('input[name="goal"]')[0]!.setValue(true)
     await wrapper.findAll('input[name="script"]')[1]!.setValue(true)
+    expect(wrapper.text()).toContain('Focus the card to use arrow keys.')
+    expect(wrapper.text()).not.toContain('Space / Enter reveals.')
     await wrapper.findAll('input[name="reading"]')[1]!.setValue(true)
     expect(wrapper.text()).toContain('Tap to reveal')
+    expect(wrapper.text()).toContain('Space / Enter reveals.')
+    await wrapper.findAll('input[name="reading"]')[0]!.setValue(true)
+    expect(wrapper.text()).not.toContain('Space / Enter reveals.')
     const store = useStudyStore()
     expect(store.progress.settings.script).toBe('katakana')
     for (let i = 0; i < 5; i++) {

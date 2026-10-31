@@ -133,7 +133,7 @@ function undo() {
           <StudyComplete v-else :exhausted="exhausted" :extra="session.extra" @practice="store.startExtra" />
           <p id="card-help" class="mt-7 mb-4 text-center text-xs text-muted">{{ $t('study.gestureHint') }}</p>
           <RatingControls :disabled="!store.current || animating" :can-undo="canUndo && !animating" @rate="rateCurrent" @undo="undo" />
-          <p class="mt-2 text-center text-[0.65rem] leading-[1.7] text-muted">{{ $t('study.keyboardHint') }}</p>
+          <p class="mt-2 text-center text-[0.65rem] leading-[1.7] text-muted">{{ $t('study.keyboardHint') }} <span v-if="store.progress.settings.reading === 'reveal'">{{ $t('study.keyboardRevealHint') }}</span></p>
           <p class="sr-only" role="status" aria-live="polite" aria-atomic="true">{{ announcement }} {{ $t('study.progressAnnouncement', { count: session.completed.length, goal: store.progress.settings.goal, percent: dailyPercent }) }}</p>
         </section>
         <aside class="hidden max-w-44 justify-self-center pt-16 desktop:block">
