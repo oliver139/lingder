@@ -2,7 +2,7 @@
 
 ## Project context
 
-Lingder is an English-first language-learning web app with a dating-style flashcard interface. Its approved first release covers Japanese kana and Taiwan Zhuyin, with progress saved in localStorage. The first release is implemented with Nuxt 4, Vue 3, and TypeScript: typed decks, daily sessions, browser persistence, swipe/keyboard controls, settings, mastery, and Undo.
+Lingder is a multilingual language-learning web app with Traditional Chinese as its default language and a dating-style flashcard interface. Its approved first release covers Japanese kana and Taiwan Zhuyin, with progress saved in localStorage. The first release is implemented with Nuxt 4, Vue 3, and TypeScript: typed decks, daily sessions, browser persistence, swipe/keyboard controls, settings, mastery, and Undo.
 
 It has its own Git repository and must not import the source site's Git metadata, history, logs, or remotes.
 
@@ -81,7 +81,7 @@ Only commit when the user explicitly asks; do not commit automatically. When com
 - Use only the installed `bx`, `lucide`, and `ri` icon collections. Ask the user for confirmation before adding another icon pack.
 - Load Google Noto fonts through Nuxt Fonts: sans-serif families for interface text and language-appropriate serif families for flashcard characters. Preserve Japanese and Traditional Chinese glyph coverage.
 - Use Valibot when form validation is needed. Fixed-choice settings do not require a validation dependency by themselves.
-- Active locales are English (`en`, default), Traditional Chinese (`zh`, language `zh-Hant`), and Japanese (`ja`). Keep their locale files and Nuxt UI locale mappings aligned.
+- Active locales are English (`en`), Traditional Chinese (`zh`, default, language `zh-Hant`), and Japanese (`ja`). Keep their locale files and Nuxt UI locale mappings aligned.
 - Put user-facing copy in locale files. Add English first and use English fallback until translations are requested.
 - Use `<NuxtLinkLocale>` from `@nuxtjs/i18n` for internal page links, passing unlocalized paths or route names directly instead of wrapping `<NuxtLink>` destinations in `localePath()`. Use ordinary anchors for external URLs. Preserve `prefix_and_default` routing and reactive `useLocaleHead()` metadata. When custom active-link handling is needed across prefixed and unprefixed URLs, use `custom` with `useRouteBaseName(route)`.
 - Public metadata uses `SITE_NAME`, `SITE_DESC`, `SITE_URL`, and `SITE_IMG`. Document safe examples in `.env.example`; keep local environment files ignored and never put secrets in public metadata.

@@ -94,7 +94,7 @@ export default defineNuxtConfig({
   i18n: {
     restructureDir: 'app/i18n',
     strategy: 'prefix_and_default',
-    defaultLocale: 'en',
+    defaultLocale: 'zh',
 
     locales: [
       { code: 'en', name: 'English', file: 'en.json', language: 'en', nuxtUiCode: 'en' },
