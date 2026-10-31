@@ -252,22 +252,24 @@ function keydown(event: KeyboardEvent) {
           </span>
           <span class="mt-auto pt-4 text-center text-[0.7rem] text-muted" :role="index === 0 && pronunciation.error.value ? 'alert' : undefined">{{ $t(index === 0 && pronunciation.error.value ? 'study.audio.error' : item.showReading ? 'study.takeYourTime' : 'study.revealHint') }}</span>
         </div>
-        <UButton
-          v-if="index === 0 && recording"
-          class="
-            absolute top-4 right-4 min-h-11 min-w-11
-            justify-center rounded-full
-          "
-          color="primary"
-          variant="ghost"
-          :icon="pronunciation.loading.value ? 'i-lucide-loader-circle' : pronunciation.playing.value ? 'i-lucide-audio-lines' : 'i-lucide-volume-2'"
-          :ui="{ leadingIcon: pronunciation.loading.value ? 'animate-spin motion-reduce:animate-none' : undefined }"
-          :disabled="!item.showReading || committed"
-          :title="$t(item.showReading ? 'study.audio.play' : 'study.audio.revealFirst')"
-          @click.stop="pronunciation.play(recording.src)"
-          :aria-busy="pronunciation.loading.value"
-          :aria-label="$t(item.showReading ? 'study.audio.play' : 'study.audio.revealFirst')"
-        />
+        <Transition appear enter-active-class="transition-opacity duration-250 ease-out motion-reduce:transition-none motion-reduce:duration-0" enter-from-class="opacity-0" enter-to-class="opacity-100">
+          <UButton
+            v-if="index === 0 && recording && item.showReading"
+            class="
+              absolute top-4 right-4 min-h-11 min-w-11
+              justify-center rounded-full
+            "
+            color="primary"
+            variant="ghost"
+            :icon="pronunciation.loading.value ? 'i-lucide-loader-circle' : pronunciation.playing.value ? 'i-lucide-audio-lines' : 'i-lucide-volume-2'"
+            :ui="{ leadingIcon: pronunciation.loading.value ? 'animate-spin motion-reduce:animate-none' : undefined }"
+            :disabled="committed"
+            :title="$t('study.audio.play')"
+            :aria-busy="pronunciation.loading.value"
+            :aria-label="$t('study.audio.play')"
+            @click.stop="pronunciation.play(recording.src)"
+          />
+        </Transition>
       </div>
     </TransitionGroup>
   </div>

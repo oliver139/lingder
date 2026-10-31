@@ -293,14 +293,14 @@ it.each([
   expect(Number(getComputedStyle(restored).opacity)).toBe(1)
 })
 
-it('enables pronunciation after reveal without capturing, revealing, or rating from the speaker', async () => {
+it('shows pronunciation only after reveal without capturing, revealing, or rating from the speaker', async () => {
   const play = vi.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue()
   vi.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(() => undefined)
   vi.spyOn(HTMLMediaElement.prototype, 'load').mockImplementation(() => undefined)
-  const { card, rate } = await setup()
+  const { card, rate, screen } = await setup()
   const wrapper = card.element().parentElement!
   const capture = vi.spyOn(wrapper, 'setPointerCapture').mockImplementation(() => undefined)
-  await expect.element(page.getByRole('button', { name: 'study.audio.revealFirst' })).toBeDisabled()
+  await expect.element(page.getByRole('button', { name: 'study.audio.play' })).not.toBeInTheDocument()
   expect(play).not.toHaveBeenCalled()
   await card.click()
   capture.mockClear()
@@ -314,6 +314,8 @@ it('enables pronunciation after reveal without capturing, revealing, or rating f
   await userEvent.keyboard('{Enter}')
   expect(play).toHaveBeenCalledTimes(2)
   expect(rate).not.toHaveBeenCalled()
+  await screen.rerender({ card: studyDecks[0]!.cards[1]! })
+  await expect.element(page.getByRole('button', { name: 'study.audio.play' })).not.toBeInTheDocument()
 })
 
 it('stops audio when dragging or hiding the reading, and when the card changes', async () => {
@@ -334,7 +336,7 @@ it('stops audio when dragging or hiding the reading, and when the card changes',
   pause.mockClear()
   await screen.rerender({ readingDisplay: 'reveal' })
   expect(pause).toHaveBeenCalled()
-  await expect.element(page.getByRole('button', { name: 'study.audio.revealFirst' })).toBeDisabled()
+  await expect.element(page.getByRole('button', { name: 'study.audio.play' })).not.toBeInTheDocument()
   await screen.rerender({ readingDisplay: 'visible' })
   await speaker.click()
   pause.mockClear()
