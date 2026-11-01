@@ -67,6 +67,13 @@ export default defineNuxtConfig({
 
   compatibilityDate: '2025-07-15',
 
+  nitro: {
+    prerender: {
+      routes: ['/', '/table', '/zh', '/zh/table', '/en', '/en/table', '/ja', '/ja/table'],
+      failOnError: true,
+    },
+  },
+
   vite: {
     plugins: [
       tailwindcss(),
@@ -107,5 +114,10 @@ export default defineNuxtConfig({
       redirectOn: 'root',
     },
     baseUrl: siteUrl,
+  },
+
+  icon: {
+    clientBundle: { scan: true },
+    fallbackToApi: false,
   },
 })

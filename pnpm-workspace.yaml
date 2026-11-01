@@ -5,6 +5,7 @@ allowBuilds:
   sharp: true
   unrs-resolver: true
   vue-demi: true
+  workerd: false # Assets-only deployment does not execute the Workers runtime.
 minimumReleaseAgeExclude:
   - '@oliver139/*'
   - '@iconify-json/lucide@1.2.149'
