@@ -56,6 +56,8 @@ function screen() {
 describe('study screen integration', () => {
   it('shows a stable loading placeholder before mounted initialization renders the deck', async () => {
     const wrapper = screen()
+    expect(wrapper.get('h1').text()).toContain('Meet your next')
+    expect(wrapper.text()).toContain(en.seo.introduction)
     expect(wrapper.get('[role="status"]').text()).toContain('Getting your cards ready')
     expect(wrapper.get('[role="status"] [aria-hidden="true"]').exists()).toBe(true)
     expect(wrapper.find('.study-card').exists()).toBe(false)

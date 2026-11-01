@@ -54,6 +54,27 @@ async function undo() {
 
 <template>
   <div>
+    <section class="pt-4 pb-3 text-center sm:pt-10 sm:pb-7">
+      <p class="text-[0.65rem] font-semibold tracking-[0.17em] text-muted">{{ $t('study.eyebrow') }}</p>
+      <h1
+        class="
+          mx-auto mt-2 max-w-75 text-2xl leading-[1.2]
+          font-medium tracking-[-0.055em]
+          sm:mt-3 sm:max-w-none sm:text-[clamp(1.75rem,4vw,2.65rem)]
+        "
+      >
+        {{ $t('study.title') }} <span class="text-primary">{{ $t('study.titleAccent') }}</span>
+      </h1>
+      <p
+        class="
+          mx-auto mt-1.5 max-w-160 px-4 text-xs
+          text-muted
+          sm:mt-3 sm:text-sm
+        "
+      >
+        {{ $t('seo.introduction') }}
+      </p>
+    </section>
     <div
       v-if="!store.ready"
       class="
@@ -117,19 +138,6 @@ async function undo() {
     </div>
     <template v-else>
       <p v-if="storageWarning" class="mt-4 rounded-[0.7rem] bg-elevated p-4 text-sm" role="alert">{{ $t(`study.storage.${storageWarning}`) }}</p>
-      <section class="pt-4 pb-3 text-center sm:pt-10 sm:pb-7">
-        <p class="text-[0.65rem] font-semibold tracking-[0.17em] text-muted">{{ $t('study.eyebrow') }}</p>
-        <h1
-          class="
-            mx-auto mt-2 max-w-75 text-2xl leading-[1.2]
-            font-medium tracking-[-0.055em]
-            sm:mt-3 sm:max-w-none sm:text-[clamp(1.75rem,4vw,2.65rem)]
-          "
-        >
-          {{ $t('study.title') }} <span class="text-primary">{{ $t('study.titleAccent') }}</span>
-        </h1>
-        <p class="mt-1.5 text-xs text-muted sm:mt-3 sm:text-sm">{{ $t('study.subtitle') }}</p>
-      </section>
       <ModeSelector :mode="store.saved.mode" @change="store.setMode" />
       <div
         class="
