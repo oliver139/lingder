@@ -4,10 +4,11 @@ import { defineComponent } from 'vue'
 import AudioCredits from '@/components/study/AudioCredits.vue'
 import { pronunciationRecordings } from '@/data/audio'
 import en from '@/i18n/locales/en.json'
-import zh from '@/i18n/locales/zh.json'
+import zhHans from '@/i18n/locales/zh-Hans.json'
+import zhHant from '@/i18n/locales/zh-Hant.json'
 
 describe('audio credits', () => {
-  it.each([['en', en], ['zh', zh]] as const)('lists recording credits and the localized MOE notice in %s', (_locale, messages) => {
+  it.each([['en', en], ['zh-Hant', zhHant], ['zh-Hans', zhHans]] as const)('lists recording credits and the localized MOE notice in %s', (_locale, messages) => {
     const wrapper = mount(AudioCredits, {
       global: {
         mocks: { $t: (key: string) => key === 'study.audio.zhuyinCredit' ? messages.study.audio.zhuyinCredit : key === 'study.audio.zhuyinLicense' ? messages.study.audio.zhuyinLicense : key },

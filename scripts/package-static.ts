@@ -4,7 +4,7 @@ import process from 'node:process'
 import { cleanBuildOutputDir, getWorkerAssetsDir, readBuildOutput, writeAssets, writeRootConfig, writeWorkerConfig } from '@cloudflare/build-output-utils'
 import config from '../cloudflare.config.ts'
 
-export const staticRoutes = ['/', '/table', '/zh', '/zh/table', '/en', '/en/table', '/ja', '/ja/table']
+export const staticRoutes = ['/', '/table', '/zh-Hant', '/zh-Hant/table', '/zh-Hans', '/zh-Hans/table', '/en', '/en/table', '/ja', '/ja/table']
 
 export async function packageStatic(root: string, revision: string, bindDomain = false) {
   if (!/^[a-f0-9]{40}$/.test(revision)) {

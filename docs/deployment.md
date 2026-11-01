@@ -12,7 +12,7 @@ Publishing a **stable GitHub release** runs the [deployment workflow](../.github
 
 1. Check out the release's exact commit and install the declared Node/pnpm versions with the frozen lockfile.
 2. Run lint, unit tests, and Chromium/WebKit browser tests.
-3. Generate all eight card/table routes, with `SITE_URL=https://lingder.olimak.dev`.
+3. Generate all ten card/table routes, with `SITE_URL=https://lingder.olimak.dev`.
 4. Package `.output/public` into Cloudflare Build Output, validate it without uploading, and deploy it with the pinned `cf` CLI.
 5. Verify localized pages, audio, 404 responses, and the deployed commit identifier. Report the result in the Actions summary.
 

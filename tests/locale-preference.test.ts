@@ -9,7 +9,7 @@ afterEach(() => {
   }
 })
 
-function setup(path = '/', saved?: string, initialLocale = 'zh') {
+function setup(path = '/', saved?: string, initialLocale = 'zh-Hant') {
   const route = ref({ path })
   const cookie = ref(saved)
   const locale = ref(initialLocale)
@@ -33,16 +33,16 @@ function setup(path = '/', saved?: string, initialLocale = 'zh') {
 }
 
 describe('remembered interface language', () => {
-  it.each([undefined, 'invalid', 'zh'])('defaults / to Chinese for preference %s', async (saved) => {
+  it.each([undefined, 'invalid', 'zh', 'zh-Hant'])('defaults / to Chinese for preference %s', async (saved) => {
     const app = setup('/', saved)
     app.ready()
     await flushPromises()
-    expect(app.locale.value).toBe('zh')
-    expect(app.cookie.value).toBe('zh')
+    expect(app.locale.value).toBe('zh-Hant')
+    expect(app.cookie.value).toBe('zh-Hant')
     expect(app.setLocale).not.toHaveBeenCalled()
   })
 
-  it.each(['en', 'ja'])('restores %s at / only after Nuxt is ready', async (saved) => {
+  it.each(['en', 'ja', 'zh-Hans'])('restores %s at / only after Nuxt is ready', async (saved) => {
     const app = setup('/', saved)
     expect(app.setLocale).not.toHaveBeenCalled()
     app.ready()
@@ -52,7 +52,7 @@ describe('remembered interface language', () => {
     expect(app.cookie.value).toBe(saved)
   })
 
-  it.each(['/en/', '/zh/', '/ja/', '/en/table', '/ja'])('honors and remembers explicit URL %s', async (path) => {
+  it.each(['/en/', '/zh-Hant/', '/zh-Hans/', '/ja/', '/en/table', '/zh-Hans/table', '/ja'])('honors and remembers explicit URL %s', async (path) => {
     const app = setup(path, 'ja', path.split('/')[1])
     app.ready()
     await flushPromises()
@@ -61,7 +61,7 @@ describe('remembered interface language', () => {
   })
 
   it('remembers language-switch navigation and restores it on a later root visit', async () => {
-    const app = setup('/en/', 'zh', 'en')
+    const app = setup('/en/', 'zh-Hant', 'en')
     app.ready()
     await flushPromises()
     app.route.value.path = '/ja/table'
@@ -69,7 +69,7 @@ describe('remembered interface language', () => {
     await flushPromises()
     expect(app.cookie.value).toBe('ja')
     app.route.value.path = '/'
-    app.locale.value = 'zh'
+    app.locale.value = 'zh-Hant'
     await flushPromises()
     expect(app.setLocale).toHaveBeenCalledWith('ja')
     app.wrapper.unmount()

@@ -14,13 +14,13 @@ const i18nHead = useLocaleHead()
 let stopRemembering: (() => void) | undefined
 onNuxtReady(() => {
   stopRemembering = watch(() => route.path, async (path) => {
-    const explicitLocale = /^\/(en|zh|ja)(?:\/|$)/.exec(path)?.[1]
+    const explicitLocale = /^\/(zh-Hant|zh-Hans|en|ja)(?:\/|$)/.exec(path)?.[1]
     if (explicitLocale) {
       rememberedLocale.value = explicitLocale
     } else if (path === '/') {
-      const target = rememberedLocale.value === 'en' || rememberedLocale.value === 'ja'
+      const target = rememberedLocale.value === 'en' || rememberedLocale.value === 'ja' || rememberedLocale.value === 'zh-Hans'
         ? rememberedLocale.value
-        : 'zh'
+        : 'zh-Hant'
       rememberedLocale.value = target
       if (locale.value !== target) {
         await setLocale(target)

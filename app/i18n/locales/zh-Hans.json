@@ -1,0 +1,125 @@
+{
+  "app": {
+    "theme": {
+      "name": {
+        "light": "浅色模式",
+        "dark": "深色模式"
+      },
+      "switch": {
+        "theme": "切换主题",
+        "light": "切换至@:app.theme.name.light",
+        "dark": "切换至@:app.theme.name.dark"
+      }
+    },
+    "navigation": {
+      "label": "主导航",
+      "cards": "字卡",
+      "table": "发音表"
+    },
+    "language": "界面语言"
+  },
+  "study": {
+    "brand": "Lingder",
+    "home": "Lingder 首页",
+    "smallSteps": "每天一小步，认识新文字。",
+    "eyebrow": "每天学一点",
+    "title": "认识下一个",
+    "titleAccent": "读音。",
+    "subtitle": "每天一点练习，开启阅读的新世界。",
+    "mode": "学习语言",
+    "modeName": {
+      "ja": "日文",
+      "tw": "台湾注音"
+    },
+    "hiragana": "平假名",
+    "katakana": "片假名",
+    "zhuyin": "注音",
+    "both": "两者都选",
+    "loading": "正在准备你的字卡…",
+    "yourRhythm": "你的每日学习节奏",
+    "todayCount": "张字卡已于今日练习",
+    "dailyProgress": "每日学习进度",
+    "extraCount": "另加 {count} 张加强练习字卡",
+    "dailySession": "今日字卡",
+    "extraPractice": "加强练习",
+    "remaining": "剩余 {count} 张",
+    "practice": "字卡练习",
+    "cardLabel": "{script}字卡：{prompt}",
+    "historicalBadge": "历史假名",
+    "tapReveal": "点一下显示读音",
+    "takeYourTime": "慢慢来，让印象更深一点。",
+    "revealHint": "也可以按空格键或 Enter 显示读音",
+    "review": "稍后复习",
+    "mastered": "已熟记",
+    "undo": "撤销上一次评定",
+    "gestureHint": "← → 稍后复习 · ↑ ↓ 已熟记",
+    "keyboardHint": "点击字卡后，即可使用方向键。",
+    "keyboardRevealHint": "按空格键或 Enter 显示读音。",
+    "settings": "调整学习方式",
+    "scripts": "日文文字种类",
+    "includeHistorical": "包含历史假名（ゐ / ゑ / ヰ / ヱ）",
+    "dailyGoal": "此语言的每日目标",
+    "goalOption": "{count} 张字卡",
+    "readingDisplay": "读音显示方式",
+    "readingOption": {
+      "visible": "始终显示",
+      "reveal": "点一下显示"
+    },
+    "settingsHint": "更改立即生效，今日已完成的进度会保留。",
+    "collection": "已熟记的字卡",
+    "collectionHint": "每认识一个文字，都是一点进步。可将任何字卡放回牌组，再次练习。",
+    "collectionEmpty": "熟记第一张字卡后，就会显示在这里。",
+    "restore": "放回牌组",
+    "restoreLabel": "将{script} {prompt} 放回牌组",
+    "completeTitle": "又熟悉了一点。",
+    "extraComplete": "又前进了一小步。",
+    "completeHint": "这组字卡已完成。明天再来，或继续多学一点。",
+    "exhaustedTitle": "你已经全部学会了。",
+    "exhaustedHint": "目前所选的文字都已熟记。可以放回字卡，或选择其他文字继续练习。",
+    "noteTitle": "熟悉，从第一次相遇开始。",
+    "noteBody": "不必赶进度，也不必追求满分。只要带着一点好奇心，认识眼前的文字。",
+    "reviewHint": "选择“稍后复习”的字卡，仍可能在之后的随机练习中出现。",
+    "footer": "为零碎时光中的学习而设计",
+    "localOnly": "学习进度只保存在此浏览器中。",
+    "ratedMastered": "已标记为熟记。",
+    "ratedReview": "已保留字卡供日后复习。",
+    "undone": "已撤销上一次评定。",
+    "progressAnnouncement": "每日目标 {goal} 张，已完成 {count} 张。",
+    "storage": {
+      "unavailable": "浏览器目前无法保存进度。你仍可继续学习，但离开后可能会丢失更改。",
+      "invalid": "无法读取已保存的进度，已开始新的练习。"
+    },
+    "audio": {
+      "play": "播放发音",
+      "revealFirst": "显示读音后即可聆听发音",
+      "error": "无法播放音频，请点击喇叭重试。",
+      "credits": "音频来源与许可",
+      "creditsDescription": "Lingder 发音音频的录音来源、作者与许可信息。",
+      "processing": "录音已裁去首尾静音、统一音量、限制峰值，并转换为单声道 MP3。",
+      "recordings": "录音详细信息（{count} 条）",
+      "source": "原始来源",
+      "japaneseCredit": "现代假名录音由 FUN Japanese Learning 制作，通过 kana-trainer 获取，依 CC BY 4.0 许可使用。",
+      "japaneseProcessing": "46 个现代假名 MP3 文件均原样使用。历史假名 wi 与 we 沿用 Wikimedia 的公有领域录音，并经首尾静音裁切、音量统一、峰值限制及 MP3 转换。",
+      "zhuyinCredit": "2017 © 教育部，国语注音符号手册-开放部件。",
+      "zhuyinLicense": "此素材依“知识共享 署名 4.0 国际许可协议”向公众发布，使用者须遵守该协议的各项规定。"
+    }
+  },
+  "audioTest": {
+    "title": "发音表",
+    "description": "聆听每个文字的发音，包含历史假名。播放另一个文字时，前一段录音会停止。这里的操作不会影响学习进度。",
+    "play": "播放{script} {character} 的发音",
+    "rows": {
+      "vowels": "元音",
+      "k": "か行（K）",
+      "s": "さ行（S）",
+      "t": "た行（T）",
+      "n": "な行（N）",
+      "h": "は行（H）",
+      "m": "ま行（M）",
+      "y": "や行（Y）",
+      "r": "ら行（R）",
+      "w": "わ行（W）",
+      "nasal": "拨音（ん）"
+    }
+  }
+}

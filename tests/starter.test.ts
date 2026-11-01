@@ -3,7 +3,8 @@ import { describe, expect, it, vi } from 'vitest'
 import { defineComponent } from 'vue'
 import DefaultLayout from '@/layouts/default.vue'
 
-vi.stubGlobal('useI18n', () => ({ locale: 'en', locales: [{ code: 'en', name: 'English' }, { code: 'zh', name: '繁體中文' }, { code: 'ja', name: '日本語' }], setLocale: vi.fn() }))
+const setLocale = vi.fn()
+vi.stubGlobal('useI18n', () => ({ locale: 'en', locales: [{ code: 'zh-Hant', name: '繁體中文' }, { code: 'zh-Hans', name: '簡体中文' }, { code: 'en', name: 'English' }, { code: 'ja', name: '日本語' }], setLocale }))
 vi.stubGlobal('useRoute', () => ({ name: 'index___en' }))
 vi.stubGlobal('useRouteBaseName', () => () => 'index')
 
@@ -19,7 +20,7 @@ describe('starter', () => {
           NuxtLinkLocale: true,
           ThemeToggler: true,
           AudioCredits: true,
-          USelect: true,
+          USelect: defineComponent({ name: 'USelect', props: ['items', 'modelValue', 'labelKey', 'valueKey'], emits: ['update:modelValue'], template: '<div />' }),
         },
       },
       slots: {
@@ -32,5 +33,16 @@ describe('starter', () => {
     expect(wrapper.find('main header, main footer').exists()).toBe(false)
     expect(wrapper.get('header').exists()).toBe(true)
     expect(wrapper.get('footer').exists()).toBe(true)
+    const selector = wrapper.getComponent({ name: 'USelect' })
+    expect(selector.props('items')).toEqual([
+      { code: 'zh-Hant', name: '繁體中文' },
+      { code: 'zh-Hans', name: '簡体中文' },
+      { code: 'en', name: 'English' },
+      { code: 'ja', name: '日本語' },
+    ])
+    expect(selector.props('labelKey')).toBe('name')
+    expect(selector.props('valueKey')).toBe('code')
+    selector.vm.$emit('update:modelValue', 'zh-Hans')
+    expect(setLocale).toHaveBeenCalledWith('zh-Hans')
   })
 })
