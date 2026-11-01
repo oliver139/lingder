@@ -1,8 +1,34 @@
 <script setup lang="ts">
 import * as locales from '@nuxt/ui/locale'
 
-const { localeProperties } = useI18n()
+const { locale, localeProperties, setLocale } = useI18n()
+const route = useRoute()
+const rememberedLocale = useCookie<string>('lingder.locale', {
+  maxAge: 60 * 60 * 24 * 365,
+  sameSite: 'lax',
+  path: '/',
+})
 const i18nHead = useLocaleHead()
+
+// Wait for Nuxt/i18n hydration before restoring preferences; explicit locale URLs win.
+let stopRemembering: (() => void) | undefined
+onNuxtReady(() => {
+  stopRemembering = watch(() => route.path, async (path) => {
+    const explicitLocale = /^\/(en|zh|ja)(?:\/|$)/.exec(path)?.[1]
+    if (explicitLocale) {
+      rememberedLocale.value = explicitLocale
+    } else if (path === '/') {
+      const target = rememberedLocale.value === 'en' || rememberedLocale.value === 'ja'
+        ? rememberedLocale.value
+        : 'zh'
+      rememberedLocale.value = target
+      if (locale.value !== target) {
+        await setLocale(target)
+      }
+    }
+  }, { immediate: true })
+})
+onBeforeUnmount(() => stopRemembering?.())
 
 useHead(() => ({
   htmlAttrs: i18nHead.value.htmlAttrs,

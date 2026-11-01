@@ -108,7 +108,7 @@ export default defineNuxtConfig({
       { code: 'zh', name: '繁體中文', file: 'zh.json', language: 'zh-Hant', nuxtUiCode: 'zh_tw' },
       { code: 'ja', name: '日本語', file: 'ja.json', language: 'ja', nuxtUiCode: 'ja' },
     ],
-    // Unprefixed routes always use Traditional Chinese; the switcher selects localized URLs.
+    // app.vue restores the remembered locale at / without browser-language detection.
     detectBrowserLanguage: false,
     baseUrl: siteUrl,
   },
