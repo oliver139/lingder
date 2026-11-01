@@ -185,7 +185,7 @@ function keydown(event: KeyboardEvent) {
     ref="stack"
     class="
       relative isolate z-10 mx-auto w-full
-      max-w-[16.40625rem]
+      max-w-60
       sm:max-w-[21.09375rem]
     "
   >
