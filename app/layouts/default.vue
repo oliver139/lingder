@@ -1,7 +1,17 @@
 <script setup lang="ts">
 const getRouteBaseName = useRouteBaseName()
 const route = useRoute()
-const { locale, locales, setLocale } = useI18n()
+const { locale, locales } = useI18n()
+const switchLocalePath = useSwitchLocalePath()
+
+function selectLocale(code: 'zh-Hant' | 'zh-Hans' | 'en' | 'ja') {
+  const path = switchLocalePath(code)
+  // The default locale must not pass through / and restore the previous preference.
+  const explicitPath = code === 'zh-Hant' && !/^\/zh-Hant(?:[/?#]|$)/.test(path)
+    ? `/zh-Hant${path}`
+    : path
+  return navigateTo(explicitPath)
+}
 </script>
 
 <template>
@@ -75,7 +85,7 @@ const { locale, locales, setLocale } = useI18n()
               "
               :ui="{ leading: 'inset-0 justify-center p-0', leadingIcon: 'text-primary', value: 'sr-only', trailing: 'hidden', content: 'min-w-36' }"
               :aria-label="$t('app.language')"
-              @update:model-value="setLocale($event)"
+              @update:model-value="selectLocale($event)"
             />
             <ThemeToggler />
           </div>

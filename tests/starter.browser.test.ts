@@ -5,6 +5,8 @@ import { defineComponent } from 'vue'
 import DefaultLayout from '@/layouts/default.vue'
 
 vi.stubGlobal('useI18n', () => ({ locale: 'en', locales: [{ code: 'zh-Hant', name: '繁體中文' }, { code: 'zh-Hans', name: '簡体中文' }, { code: 'en', name: 'English' }, { code: 'ja', name: '日本語' }], setLocale: vi.fn() }))
+vi.stubGlobal('useSwitchLocalePath', () => (code: string) => `/${code}/`)
+vi.stubGlobal('navigateTo', vi.fn())
 vi.stubGlobal('useRoute', () => ({ name: 'index___en' }))
 vi.stubGlobal('useRouteBaseName', () => () => 'index')
 

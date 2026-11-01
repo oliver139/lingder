@@ -3,13 +3,19 @@ import { describe, expect, it, vi } from 'vitest'
 import { defineComponent } from 'vue'
 import DefaultLayout from '@/layouts/default.vue'
 
-const setLocale = vi.fn()
-vi.stubGlobal('useI18n', () => ({ locale: 'en', locales: [{ code: 'zh-Hant', name: '繁體中文' }, { code: 'zh-Hans', name: '簡体中文' }, { code: 'en', name: 'English' }, { code: 'ja', name: '日本語' }], setLocale }))
+const navigateTo = vi.fn()
+vi.stubGlobal('navigateTo', navigateTo)
+vi.stubGlobal('useI18n', () => ({ locale: 'en', locales: [{ code: 'zh-Hant', name: '繁體中文' }, { code: 'zh-Hans', name: '簡体中文' }, { code: 'en', name: 'English' }, { code: 'ja', name: '日本語' }] }))
 vi.stubGlobal('useRoute', () => ({ name: 'index___en' }))
 vi.stubGlobal('useRouteBaseName', () => () => 'index')
 
 describe('starter', () => {
-  it('renders page content inside the main landmark', () => {
+  it.each([
+    ['/?from=menu#top', '/zh-Hant/?from=menu#top'],
+    ['/table?from=menu#top', '/zh-Hant/table?from=menu#top'],
+    ['/zh-Hant/table?from=menu#top', '/zh-Hant/table?from=menu#top'],
+  ])('renders the layout and selects Traditional Chinese explicitly from %s', (defaultPath, expectedPath) => {
+    vi.stubGlobal('useSwitchLocalePath', () => (code: string) => code === 'zh-Hant' ? defaultPath : `/${code}/?from=menu#top`)
     const wrapper = mount(DefaultLayout, {
       global: {
         mocks: { $t: (key: string) => key },
@@ -43,6 +49,8 @@ describe('starter', () => {
     expect(selector.props('labelKey')).toBe('name')
     expect(selector.props('valueKey')).toBe('code')
     selector.vm.$emit('update:modelValue', 'zh-Hans')
-    expect(setLocale).toHaveBeenCalledWith('zh-Hans')
+    expect(navigateTo).toHaveBeenCalledWith('/zh-Hans/?from=menu#top')
+    selector.vm.$emit('update:modelValue', 'zh-Hant')
+    expect(navigateTo).toHaveBeenLastCalledWith(expectedPath)
   })
 })
