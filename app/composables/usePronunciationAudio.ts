@@ -6,30 +6,51 @@ export function usePronunciationAudio() {
   let request = 0
   let source: string | null = null
 
-  function stop() {
+  function stop(release = true) {
     request++
-    source = null
+    if (release) source = null
     loading.value = false
     playing.value = false
     error.value = false
     if (audio.value) {
       audio.value.pause()
-      audio.value.removeAttribute('src')
-      audio.value.load()
+      if (release) {
+        audio.value.removeAttribute('src')
+        audio.value.load()
+      } else {
+        audio.value.currentTime = 0
+      }
     }
+  }
+
+  function preload(src: string) {
+    if (typeof window === 'undefined') return
+    const nextSource = new URL(src, document.baseURI).href
+    if (source === nextSource) return
+    stop()
+    const element = audio.value ?? new Audio()
+    audio.value = element
+    element.preload = 'auto'
+    source = nextSource
+    element.src = source
+    element.load()
   }
 
   async function play(src: string) {
     if (typeof window === 'undefined') {
       return
     }
-    stop()
+    const nextSource = new URL(src, document.baseURI).href
+    const reusePreload = source === nextSource && audio.value?.preload === 'auto'
+    stop(!reusePreload)
     const currentRequest = request
     const element = audio.value ?? new Audio()
     audio.value = element
-    element.preload = 'none'
-    source = new URL(src, document.baseURI).href
-    element.src = source
+    if (!reusePreload) {
+      element.preload = 'none'
+      source = nextSource
+      element.src = source
+    }
     loading.value = true
     try {
       await element.play()
@@ -53,8 +74,9 @@ export function usePronunciationAudio() {
   })
   useEventListener(audio, 'error', () => {
     if (source && audio.value?.currentSrc === source) {
+      const wasRequested = loading.value || playing.value
       stop()
-      error.value = true
+      error.value = wasRequested
     }
   })
   onBeforeUnmount(() => {
@@ -62,5 +84,5 @@ export function usePronunciationAudio() {
     audio.value = null
   })
 
-  return { play, stop, loading, playing, error }
+  return { preload, play, stop, loading, playing, error }
 }

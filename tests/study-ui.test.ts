@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent, nextTick } from 'vue'
 import MasteredCollection from '@/components/study/MasteredCollection.vue'
 import ModeSelector from '@/components/study/ModeSelector.vue'
@@ -23,6 +23,11 @@ function t(key: string, params: Record<string, string | number> = {}) {
   return String(value).replace(/\{(\w+)\}/g, (_, name: string) => String(params[name] ?? name))
 }
 
+beforeAll(() => {
+  vi.spyOn(HTMLMediaElement.prototype, 'load').mockImplementation(() => undefined)
+  vi.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(() => undefined)
+})
+
 beforeEach(() => {
   setActivePinia(createPinia())
   localStorage.clear()
@@ -32,6 +37,8 @@ beforeEach(() => {
   vi.stubGlobal('usePronunciationAudio', usePronunciationAudio)
   vi.stubGlobal('useI18n', () => ({ t }))
 })
+
+afterAll(() => vi.restoreAllMocks())
 
 function screen() {
   return mount(IndexPage, {

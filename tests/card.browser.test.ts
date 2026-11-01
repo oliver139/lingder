@@ -5,6 +5,7 @@ import { defineComponent, nextTick, shallowRef } from 'vue'
 import StudyCard from '@/components/study/StudyCard.vue'
 import { useCardGesture } from '@/composables/useCardGesture'
 import { usePronunciationAudio } from '@/composables/usePronunciationAudio'
+import { pronunciationByCard } from '@/data/audio'
 import { studyDecks } from '@/data/decks'
 
 vi.stubGlobal('useCardGesture', useCardGesture)
@@ -342,4 +343,27 @@ it('stops audio when dragging or hiding the reading, and when the card changes',
   pause.mockClear()
   await screen.rerender({ card: studyDecks[0]!.cards[1]! })
   expect(pause).toHaveBeenCalled()
+})
+
+it('preloads only the active card, retains it while hidden, and loads promoted and undone cards', async () => {
+  const play = vi.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue()
+  vi.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(() => undefined)
+  const load = vi.spyOn(HTMLMediaElement.prototype, 'load').mockImplementation(() => undefined)
+  const { screen } = await setup()
+  const deck = studyDecks[0]!
+  const audio = load.mock.contexts[0]!
+  expect(audio.src).toContain(pronunciationByCard[deck.cards[0]!.id]!.src)
+  expect(audio.preload).toBe('auto')
+  expect(load).toHaveBeenCalledOnce()
+  expect(play).not.toHaveBeenCalled()
+  await screen.rerender({ upcoming: [{ ...deck.cards[1]!, deck }], readingDisplay: 'visible' })
+  expect(load).toHaveBeenCalledOnce()
+  await page.getByRole('button', { name: 'study.audio.play' }).click()
+  expect(load).toHaveBeenCalledOnce()
+  await screen.rerender({ card: deck.cards[1]! })
+  expect(audio.src).toContain(pronunciationByCard[deck.cards[1]!.id]!.src)
+  await screen.rerender({ card: deck.cards[0]!, readingDisplay: 'reveal' })
+  expect(audio.src).toContain(pronunciationByCard[deck.cards[0]!.id]!.src)
+  expect(new Set(load.mock.contexts).size).toBe(1)
+  expect(play).toHaveBeenCalledOnce()
 })

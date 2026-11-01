@@ -10,7 +10,7 @@ Built with Nuxt 4, Vue 3, TypeScript, Nuxt UI, Tailwind CSS, and Pinia.
 - **Taiwan Zhuyin:** 37 symbols with pinyin sound guides.
 - **Daily practice:** Choose a goal of 5, 10, or 20 cards per language, then continue with extra practice.
 - **Flexible readings:** Keep pronunciation guides visible or reveal them on demand.
-- **Pronunciation audio:** Listen from a card or explore the pronunciation table at `/table`. In reveal mode, audio becomes available after revealing the reading.
+- **Pronunciation audio:** The active card preloads its pronunciation for playback on click; the pronunciation table at `/table` loads audio only when clicked. In reveal mode, audio becomes available after revealing the reading.
 - **Undo and mastery:** Undo multiple ratings in the current deck and return mastered characters to practice.
 - **Accessible controls:** Swipe, use labeled buttons, or study with the keyboard. Responsive layouts support phones, tablets, and desktops, with light/dark themes and reduced motion.
 

@@ -16,6 +16,9 @@ const revealed = shallowRef(false)
 const committed = shallowRef(false)
 const pronunciation = usePronunciationAudio()
 const recording = computed(() => pronunciationByCard[props.card.id])
+onMounted(() => {
+  if (recording.value) pronunciation.preload(recording.value.src)
+})
 const cards = computed(() => [{ ...props.card, deck: props.deck }, ...(props.upcoming ?? []).slice(0, 2)].map((card, index) => ({
   ...card,
   showReading: props.readingDisplay === 'visible' || (index === 0 && revealed.value),
@@ -49,7 +52,7 @@ async function rate(rating: Rating, direction?: { x: number, y: number }) {
   if (committed.value) {
     return
   }
-  pronunciation.stop()
+  pronunciation.stop(false)
   committed.value = true
   emit('busy', true)
   const id = props.card.id
@@ -98,7 +101,7 @@ async function returnCard(exit?: { x: number, y: number }) {
     return
   }
   animation?.cancel()
-  pronunciation.stop()
+  pronunciation.stop(false)
   committed.value = true
   emit('busy', true)
   const bounds = stack.value.getBoundingClientRect()
@@ -130,6 +133,7 @@ async function returnCard(exit?: { x: number, y: number }) {
 
 watch(() => props.card.id, async (id) => {
   pronunciation.stop()
+  if (recording.value) pronunciation.preload(recording.value.src)
   const hadFocus = stack.value?.contains(document.activeElement)
   animation?.cancel()
   animation = undefined
@@ -155,11 +159,11 @@ onBeforeUnmount(() => {
 defineExpose({ rate, returnCard })
 
 watch(dragging, (value) => {
-  if (value) pronunciation.stop()
+  if (value) pronunciation.stop(false)
 }, { flush: 'sync' })
 
 watch(() => props.readingDisplay, () => {
-  pronunciation.stop()
+  pronunciation.stop(false)
   revealed.value = false
 })
 

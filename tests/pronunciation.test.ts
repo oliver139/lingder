@@ -10,6 +10,7 @@ class FakeAudio extends EventTarget {
   src = ''
   preload = ''
   currentSrc = ''
+  currentTime = 0
   pause = vi.fn()
   load = vi.fn()
   play = vi.fn(() => Promise.resolve())
@@ -42,6 +43,71 @@ beforeEach(() => {
 afterEach(() => vi.stubGlobal('Audio', originalAudio))
 
 describe('pronunciation playback', () => {
+  it('preloads silently once and plays the buffered clip without clearing it', async () => {
+    const { player } = setup()
+    player.preload('/audio/ja/a.mp3')
+    const audio = FakeAudio.instances[0]!
+    expect(audio.preload).toBe('auto')
+    expect(audio.load).toHaveBeenCalledOnce()
+    expect(audio.play).not.toHaveBeenCalled()
+    expect(player.loading.value).toBe(false)
+    expect(player.playing.value).toBe(false)
+    player.preload('/audio/ja/a.mp3')
+    expect(audio.load).toHaveBeenCalledOnce()
+    await player.play('/audio/ja/a.mp3')
+    audio.currentTime = 0.5
+    player.stop(false)
+    expect(audio.currentTime).toBe(0)
+    expect(player.playing.value).toBe(false)
+    await player.play('/audio/ja/a.mp3')
+    expect(audio.removeAttribute).not.toHaveBeenCalled()
+    expect(audio.load).toHaveBeenCalledOnce()
+    expect(audio.play).toHaveBeenCalledTimes(2)
+  })
+
+  it('replaces the preloaded clip and releases it on unmount', () => {
+    const { player, wrapper } = setup()
+    player.preload('/audio/ja/a.mp3')
+    player.preload('/audio/ja/i.mp3')
+    expect(FakeAudio.instances).toHaveLength(1)
+    const audio = FakeAudio.instances[0]!
+    expect(audio.src).toContain('/audio/ja/i.mp3')
+    expect(audio.play).not.toHaveBeenCalled()
+    wrapper.unmount()
+    expect(audio.src).toBe('')
+  })
+
+  it('keeps background preload errors quiet and retries on click', async () => {
+    const { player } = setup()
+    player.preload('/audio/ja/a.mp3')
+    await nextTick()
+    const audio = FakeAudio.instances[0]!
+    audio.currentSrc = audio.src
+    audio.dispatchEvent(new Event('error'))
+    expect(player.error.value).toBe(false)
+    expect(audio.src).toBe('')
+    await player.play('/audio/ja/a.mp3')
+    expect(player.playing.value).toBe(true)
+    expect(audio.src).toContain('/audio/ja/a.mp3')
+  })
+
+  it('ignores pending playback when preloading a different card', async () => {
+    const { player } = setup()
+    player.preload('/audio/ja/a.mp3')
+    const audio = FakeAudio.instances[0]!
+    let resolve!: () => void
+    audio.play.mockImplementationOnce(() => new Promise<void>((done) => {
+      resolve = done
+    }))
+    const pending = player.play('/audio/ja/a.mp3')
+    player.preload('/audio/ja/i.mp3')
+    resolve()
+    await pending
+    expect(player.playing.value).toBe(false)
+    expect(player.loading.value).toBe(false)
+    expect(audio.src).toContain('/audio/ja/i.mp3')
+  })
+
   it('creates one player only on demand, reuses it, and restarts clips', async () => {
     const { player } = setup()
     expect(FakeAudio.instances).toHaveLength(0)
