@@ -30,18 +30,19 @@ const emit = defineEmits<{ change: [mode: StudyMode] }>()
       :key="value"
       type="button"
       class="
-        flex cursor-pointer items-center justify-center gap-2
-        rounded-[0.7rem] px-4 py-3 text-sm font-medium
-        text-muted transition-colors duration-250
+        flex min-h-11 cursor-pointer items-center justify-center
+        gap-1.5 rounded-[0.7rem] px-3 py-2 text-xs
+        font-medium text-muted transition-colors duration-250
         hover:text-highlighted
         focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary
         aria-pressed:text-inverted
         motion-reduce:transition-none
+        sm:gap-2 sm:px-4 sm:py-3 sm:text-sm
       "
       :aria-pressed="mode === value"
       @click="emit('change', value)"
     >
-      <span class="text-xl" :lang="value === 'ja' ? 'ja' : 'zh-Hant-TW'">{{ value === 'ja' ? 'あ' : 'ㄅ' }}</span>
+      <span class="text-lg sm:text-xl" :lang="value === 'ja' ? 'ja' : 'zh-Hant-TW'">{{ value === 'ja' ? 'あ' : 'ㄅ' }}</span>
       {{ $t(`study.modeName.${value}`) }}
     </button>
   </div>

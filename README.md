@@ -14,7 +14,7 @@ Built with Nuxt 4, Vue 3, TypeScript, Nuxt UI, Tailwind CSS, and Pinia.
 - **Undo and mastery:** Undo multiple ratings in the current deck and return mastered characters to practice.
 - **Accessible controls:** Swipe, use labeled buttons, or study with the keyboard. Responsive layouts support phones, tablets, and desktops, with light/dark themes and reduced motion.
 
-The interface supports Traditional Chinese (default), English, and Japanese. Browser language detection and saved preferences can select another locale. The interface language and the language you study are independent.
+The interface supports Traditional Chinese (default), English, and Japanese. Unprefixed URLs open in Traditional Chinese. Use the header language switch to choose English or Japanese; localized URLs preserve that choice when navigating or refreshing. The interface language and the language you study are independent.
 
 Swipe left/right for **Review later** and up/down for **Mastered**. When the card is focused, arrow keys do the same; Space or Enter reveals a hidden reading.
 
