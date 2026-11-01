@@ -1,14 +1,26 @@
 # Lingder
 
-An English-first language-learning app with a swipeable flashcard deck. Learn Japanese kana and Taiwan Zhuyin in small daily sessions, with progress saved in your browser.
+Learn Japanese kana and Taiwan Zhuyin with a swipeable flashcard deck, pronunciation audio, and small daily practice sessions.
 
-Built with Nuxt 4, Vue 3, TypeScript, Nuxt UI, Tailwind CSS, and Pinia. The lavender-and-ink interface supports light/dark themes, desktop and portrait mobile/tablet layouts, keyboard controls, and reduced motion. Google Noto Sans and Noto Serif JP/TC load through Nuxt Fonts.
+Built with Nuxt 4, Vue 3, TypeScript, Nuxt UI, Tailwind CSS, and Pinia.
 
-See [HANDOFF.md](HANDOFF.md) for the approved scope, implementation status, and validation record; [AGENTS.md](AGENTS.md) covers development conventions. This repository retains independent Git history from the template source.
+## Features
 
-## Setup
+- **Japanese kana:** 46 basic hiragana and 46 basic katakana, tracked separately. Study either script or both, with optional historical ゐ / ゑ / ヰ / ヱ.
+- **Taiwan Zhuyin:** 37 symbols with pinyin sound guides.
+- **Daily practice:** Choose a goal of 5, 10, or 20 cards per language, then continue with extra practice.
+- **Flexible readings:** Keep pronunciation guides visible or reveal them on demand.
+- **Pronunciation audio:** Listen from a card or explore the pronunciation table at `/table`. In reveal mode, audio becomes available after revealing the reading.
+- **Undo and mastery:** Undo multiple ratings in the current deck and return mastered characters to practice.
+- **Accessible controls:** Swipe, use labeled buttons, or study with the keyboard. Responsive layouts support phones, tablets, and desktops, with light/dark themes and reduced motion.
 
-Use pnpm and the Node/pnpm versions declared in `package.json`. The runtime and package manager are downloaded automatically when needed.
+The interface supports Traditional Chinese (default), English, and Japanese. Browser language detection and saved preferences can select another locale. The interface language and the language you study are independent.
+
+Swipe left/right for **Review later** and up/down for **Mastered**. When the card is focused, arrow keys do the same; Space or Enter reveals a hidden reading.
+
+## Local setup
+
+Use pnpm and the Node/pnpm versions declared in [package.json](package.json).
 
 ```bash
 pnpm install --frozen-lockfile
@@ -16,44 +28,11 @@ cp .env.example .env
 pnpm dev
 ```
 
-Open [localhost:3000](http://localhost:3000). English is the default interface language. Traditional Chinese routes currently use English fallback; Japanese interface localization remains disabled. Study-language selection is independent of interface locale.
+Open [localhost:3000](http://localhost:3000).
 
-## Learning
+## Configuration
 
-- Japanese: 46 basic hiragana and 46 basic katakana, individually tracked. Choose either script or both; optionally include historical ゐ / ゑ / ヰ / ヱ. Voiced forms and combinations are deferred.
-- Taiwan Zhuyin: 37 standard symbols with pinyin sound guides. These guides represent sounds, not necessarily standalone syllables (including ㄝ → ê and ㄩ → ü).
-- Set a daily goal of 5, 10, or 20 cards per language. Readings can stay visible or appear on tap, Space, or Enter.
-- Swipe left/right or use horizontal arrow keys for **Review later**. Swipe up/down or use vertical arrow keys for **Mastered**. Equivalent labeled buttons are provided. Focus the card before using its keyboard controls.
-- Undo the latest rating during the current visit. The mastered collection restores individual characters to eligibility.
-- Daily selections survive reloads. Days follow your device’s local calendar. Settings update remaining cards while preserving completed work; settings changes return extra practice to the daily session. Starting another batch or changing settings/collection clears Undo.
-- Extra practice draws fresh random batches, can repeat earlier cards, and keeps a separate daily total. No batch contains duplicates. Small pools create smaller batches.
-
-“Review later” means future random eligibility, not guaranteed next-day scheduling or spaced repetition. Mastery belongs to each card separately: あ and ア are independent.
-
-## Saved progress
-
-Settings, mastery, and sessions are stored under `lingder.study.v1` in localStorage. Storage is initialized after mounting to keep server rendering stable. Invalid or unsupported saved data starts fresh with a warning. Storage failures show a warning and allow study to continue in memory. Clearing site data removes progress; there is no account or cross-device synchronization.
-
-Audio, vocabulary decks, accounts, translations, and landscape mobile/tablet optimization are outside v1.
-
-## Structure
-
-| Path | Responsibility |
-| --- | --- |
-| `app/data/` | Typed datasets and extensible deck registry |
-| `app/utils/study/` | Selection, calendar, queue reconciliation, saved-data validation |
-| `app/stores/study.ts` | Pinia state and study actions |
-| `app/composables/` | Persistence/calendar lifecycle and Pointer Events |
-| `app/components/study/` | Card, controls, settings, collection, mode selector, completion |
-| `app/pages/index.vue` | Study-screen composition and status announcements |
-| `app/assets/css/main.css` | Tailwind theme tokens, fonts, and View Transition styles |
-| `app/i18n/locales/en.json` | Interface copy |
-
-The root `UApp` stays synchronized with the active locale; reactive locale metadata and `prefix_and_default` routing are preserved. Nuxt Content remains disabled. Dependency and package trust policies are unchanged.
-
-## Public metadata
-
-Copy `.env.example` to `.env`:
+Configure public metadata in `.env`, using [.env.example](.env.example) as a starting point:
 
 | Variable | Purpose | Default |
 | --- | --- | --- |
@@ -62,43 +41,64 @@ Copy `.env.example` to `.env`:
 | `SITE_URL` | Site origin and localization base URL | `http://localhost:3000` |
 | `SITE_IMG` | Optional social image URL | Empty |
 
-These values become public metadata; never put secrets in them. Local environment files are ignored. A Lingder SVG favicon is included. The production domain and social image remain configurable.
+These values become public metadata; never put secrets in them. Local environment files are ignored. Keep `SITE_URL` set to localhost for development; the deployment workflow sets it to `https://lingder.olimak.dev` for production generation.
 
-## Validation
+## Development and testing
+
+Install the browser test engines, then run lint and the full test suite:
 
 ```bash
-pnpm lint
-pnpm test:run
 pnpm test:browser:install
-pnpm test:browser:run
+pnpm lint
 pnpm test:all
 ```
 
-Vitest runs standalone Vue tests with explicit imports. The unit project uses jsdom and Vue Test Utils; browser tests use Playwright with Chromium and WebKit. `tests/auto-imports.ts` supplies only Vue/Pinia/VueUse globals used by application code. Nuxt runtime/plugins are not booted. UI tests stub Nuxt components at the boundary; live Nuxt checks supplement these tests.
-
-Coverage includes dataset integrity, selection/filtering, session and storage recovery, settings, mastery, Undo, extra practice, rollover, storage failure, pointer directions/cancellation, reading reveal, keyboard interaction, and theme transitions. Every custom production TypeScript function/composable is exercised through public behavior. Browser files use `.browser.test.ts`; all other test files run in the unit project. Cleanup is automatic.
-
-There is no dedicated full Vue typecheck script. `pnpm exec tsc --noEmit -p .nuxt/tsconfig.app.json` checks TypeScript sources using generated Nuxt types; it does not validate Vue templates.
-
-## Commands
+Vitest covers datasets, study sessions, persistence, Undo, extra practice, and interactions. Browser tests run in Chromium and WebKit. These tests use standalone Vue components rather than the full Nuxt runtime, so browser checks of the running app remain useful. A dedicated full Vue typecheck command is not configured.
 
 | Command | Purpose |
 | --- | --- |
-| `pnpm dev` | Development server |
-| `pnpm lint:fix` | ESLint fixes |
-| `pnpm test` / `pnpm test:browser` | Watch unit / browser tests |
-| `pnpm build` | Production build, required before a requested push |
-| `pnpm generate` | Static output |
-| `pnpm preview` | Preview production build |
+| `pnpm dev` | Start the development server |
+| `pnpm lint:fix` | Apply ESLint fixes |
+| `pnpm test` | Watch unit tests |
+| `pnpm test:browser` | Watch browser tests |
+| `pnpm test:run` | Run unit tests once |
+| `pnpm test:browser:run` | Run browser tests once |
+| `pnpm build` | Build for production |
+| `pnpm generate` | Generate the static site in `.output/public` |
+| `pnpm preview` | Preview the production build |
 
-Use frozen installs in CI. Preserve the package trust/build policies in `pnpm-workspace.yaml`; commit lockfile changes with intentional dependency changes.
+See [AGENTS.md](AGENTS.md) for development conventions and the repository map.
 
-## Dataset references
+## Deployment
+
+Lingder is configured for static hosting on **Cloudflare Workers Static Assets**. Publishing a stable GitHub release builds, tests, and deploys that release's exact commit. Normal pushes, draft releases, and prereleases do not deploy.
+
+The first release creates the Worker; its custom domain must then be attached before production verification can pass. See the [deployment guide](docs/deployment.md) for credentials, free-plan checks, local validation, first launch, and recovery.
+
+## Browser storage and limitations
+
+Settings, mastery, and daily sessions are saved in your browser's localStorage under `lingder.study.v1`. Clearing site data removes progress. There are no accounts or cross-device synchronization. If storage is unavailable, study can continue in memory with a warning.
+
+Daily goals follow your device's local calendar. Undo history lasts for the current deck during your visit; starting a new deck, including extra practice, clears it.
+
+“Review later” makes a card eligible for future random practice; it does not schedule a spaced-repetition review. Vocabulary decks, voiced kana forms, and kana combinations are not included yet. Zhuyin pinyin guides describe sounds and are not always standalone syllables.
+
+## Credits and licenses
+
+### Dataset references
 
 - [Japan Foundation kana charts](https://classroomresources.sydney.jpf.go.jp/resources/hiragana-katakana-game/)
 - [Taiwan Ministry of Education phonetic-symbol manual](https://language.moe.gov.tw/001/Upload/files/site_content/M0001/juyin/html_en/index.html)
 - [Unicode hiragana](https://www.unicode.org/charts/PDF/U3040.pdf) and [katakana](https://www.unicode.org/charts/PDF/U30A0.pdf) code charts
 
-## License
+### Licenses
 
-MIT. See `LICENSE` for retained copyright and attribution.
+Application code is licensed under MIT. See [LICENSE](LICENSE) for copyright and attribution.
+
+Pronunciation recordings have separate licenses:
+
+- Modern Japanese kana: FUN Japanese Learning, obtained through kana-trainer, under CC BY 4.0.
+- Historical Japanese kana: public-domain recordings from Wikimedia Commons.
+- Taiwan Zhuyin: Taiwan Ministry of Education recordings under CC BY 4.0.
+
+See the [recording manifest](app/data/audio/manifest.json) and [audio license notices](public/audio/licenses/) for source URLs, attribution, and processing details. These credits are also available from the app footer.
