@@ -121,5 +121,17 @@
       "w": "W row",
       "nasal": "Syllabic N"
     }
+  },
+  "seo": {
+    "cards": {
+      "title": "Learn Japanese Kana & Taiwan Zhuyin",
+      "description": "Practice Japanese hiragana, katakana and Taiwan Zhuyin with free flashcards and pronunciation audio. Set daily goals and save progress in your browser."
+    },
+    "table": {
+      "title": "Kana & Zhuyin Pronunciation Table",
+      "description": "Explore Japanese hiragana, katakana and Taiwan Zhuyin in a pronunciation table. Select a character to hear its sound and practise at your own pace."
+    },
+    "introduction": "Free Japanese kana and Taiwan Zhuyin flashcards with pronunciation audio. Your progress stays in this browser.",
+    "imageAlt": "Lingder — Japanese kana and Taiwan Zhuyin flashcards"
   }
 }

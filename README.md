@@ -75,6 +75,14 @@ Lingder is configured for static hosting on **Cloudflare Workers Static Assets**
 
 The first release creates the Worker; its custom domain must then be attached before production verification can pass. See the [deployment guide](docs/deployment.md) for credentials, free-plan checks, local validation, first launch, and recovery.
 
+## Search and sharing metadata
+
+Nuxt SEO generates static robots rules, localized sitemaps, and structured data. Page titles and descriptions are translated in the four locale files; sharing images live in `public/og/`. The card introduction is included in prerendered HTML before browser progress loads.
+
+Production generation must set `SITE_URL=https://lingder.olimak.dev`. Leave `SITE_DESC` and `SITE_IMG` empty to use localized metadata; they remain available as global overrides. OG image generation is disabled because the supplied JPGs are used directly.
+
+After deployment, verify the domain in Google Search Console and submit `https://lingder.olimak.dev/sitemap_index.xml`. Traditional Chinese uses `/` and `/table/` as canonical URLs; explicitly prefixed aliases remain available for language selection.
+
 ## Browser storage and limitations
 
 Settings, mastery, and daily sessions are saved in your browser's localStorage under `lingder.study.v1`. Clearing site data removes progress. There are no accounts or cross-device synchronization. If storage is unavailable, study can continue in memory with a warning.

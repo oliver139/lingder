@@ -39,6 +39,7 @@ useHead(() => ({
 
 <template>
   <UApp :locale="locales[localeProperties.nuxtUiCode as keyof typeof locales]">
+    <AppSeo />
     <NuxtRouteAnnouncer />
     <NuxtLayout>
       <NuxtPage />

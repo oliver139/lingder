@@ -17,6 +17,7 @@ export default defineNuxtConfig({
     // '@nuxt/content',
     '@nuxtjs/color-mode',
     '@nuxtjs/i18n',
+    '@nuxtjs/seo',
     '@pinia/nuxt',
     '@vueuse/nuxt',
   ],
@@ -34,26 +35,6 @@ export default defineNuxtConfig({
     head: {
       title: siteName,
       link: [{ rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
-      meta: [
-        { name: 'twitter:card', content: siteImage ? 'summary_large_image' : 'summary' },
-        { name: 'twitter:title', content: siteName },
-        { property: 'og:title', content: siteName },
-        { property: 'og:url', content: siteUrl },
-        { property: 'og:type', content: 'website' },
-        ...(siteDescription
-          ? [
-              { name: 'description', content: siteDescription },
-              { name: 'twitter:description', content: siteDescription },
-              { property: 'og:description', content: siteDescription },
-            ]
-          : []),
-        ...(siteImage
-          ? [
-              { name: 'twitter:image', content: siteImage },
-              { property: 'og:image', content: siteImage },
-            ]
-          : []),
-      ],
     },
   },
 
@@ -61,8 +42,22 @@ export default defineNuxtConfig({
     '@/assets/css/main.css',
   ],
 
+  site: {
+    url: siteUrl,
+    name: siteName,
+    defaultLocale: 'zh-Hant',
+    trailingSlash: true,
+  },
+
   colorMode: {
     disableTransition: true,
+  },
+
+  runtimeConfig: {
+    public: {
+      siteDescription: siteDescription || '',
+      siteImage: siteImage || '',
+    },
   },
 
   compatibilityDate: '2025-07-15',
@@ -79,6 +74,7 @@ export default defineNuxtConfig({
       tailwindcss(),
     ],
   },
+  aiReady: false,
 
   eslint: {
     config: {
@@ -101,6 +97,7 @@ export default defineNuxtConfig({
   i18n: {
     restructureDir: 'app/i18n',
     strategy: 'prefix_and_default',
+    trailingSlash: true,
     defaultLocale: 'zh-Hant',
 
     locales: [
@@ -118,4 +115,12 @@ export default defineNuxtConfig({
     clientBundle: { scan: true },
     fallbackToApi: false,
   },
+
+  // BCP 47 language prefixes intentionally contain uppercase script subtags.
+  linkChecker: { skipInspections: ['no-uppercase-chars'] },
+
+  ogImage: false,
+  seo: { canonicalLowercase: false },
+  sitemap: { zeroRuntime: true, exclude: ['/zh-Hant', '/zh-Hant/**'] },
+  skewProtection: false,
 })

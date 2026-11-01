@@ -84,7 +84,7 @@ Only commit when the user explicitly asks; do not commit automatically. When com
 - Active locales, in selector order, are Traditional Chinese (`zh-Hant`, default), Simplified Chinese (`zh-Hans`, selector label `簡体中文`), English (`en`), and Japanese (`ja`). Keep their locale files and Nuxt UI locale mappings aligned.
 - Put user-facing copy in locale files. Add English first and use English fallback until translations are requested.
 - Use `<NuxtLinkLocale>` from `@nuxtjs/i18n` for internal page links, passing unlocalized paths or route names directly instead of wrapping `<NuxtLink>` destinations in `localePath()`. Use ordinary anchors for external URLs. Preserve `prefix_and_default` routing and reactive `useLocaleHead()` metadata. When custom active-link handling is needed across prefixed and unprefixed URLs, use `custom` with `useRouteBaseName(route)`.
-- Public metadata uses `SITE_NAME`, `SITE_DESC`, `SITE_URL`, and `SITE_IMG`. Document safe examples in `.env.example`; keep local environment files ignored and never put secrets in public metadata.
+- Public metadata uses Nuxt SEO site config and localized copy in `app/components/AppSeo.vue`. `SITE_NAME` and `SITE_URL` configure the site; optional `SITE_DESC` and `SITE_IMG` override localized descriptions and supplied sharing images. Keep i18n canonical links and sitemap URLs aligned, and disable generated OG images while using static JPGs. Document safe examples in `.env.example`; keep local environment files ignored and never put secrets in public metadata.
 
 ## Testing and validation
 
