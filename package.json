@@ -1,6 +1,7 @@
 {
   "name": "lingder",
   "type": "module",
+  "version": "1.0.0",
   "private": true,
   "packageManager": "pnpm@12.16.1",
   "author": "Oliver Mak <oliver139.working@gmail.com> (https://github.com/oliver139)",
@@ -42,7 +43,9 @@
     "test:all": "vitest run",
     "deploy:package": "node scripts/package-static.ts",
     "deploy:check": "cf deploy --prebuilt --mode production --dry-run",
-    "deploy:smoke": "node scripts/smoke-deployment.ts"
+    "deploy:smoke": "node scripts/smoke-deployment.ts",
+    "release": "nr build && nlx bumpp",
+    "analyze": "nlx node-modules-inspector"
   },
   "dependencies": {
     "@nuxt/content": "^3.16.2",
@@ -61,6 +64,7 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^9.5.1",
+    "@antfu/ni": "^30.6.0",
     "@cloudflare/build-output-utils": "0.9.6",
     "@iconify-json/bx": "^1.2.3",
     "@iconify-json/lucide": "^1.2.149",
