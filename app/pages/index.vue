@@ -117,23 +117,23 @@ async function undo() {
     </div>
     <template v-else>
       <p v-if="storageWarning" class="mt-4 rounded-[0.7rem] bg-elevated p-4 text-sm" role="alert">{{ $t(`study.storage.${storageWarning}`) }}</p>
-      <section class="pt-7 pb-5 text-center sm:pt-10 sm:pb-7">
+      <section class="pt-4 pb-3 text-center sm:pt-10 sm:pb-7">
         <p class="text-[0.65rem] font-semibold tracking-[0.17em] text-muted">{{ $t('study.eyebrow') }}</p>
         <h1
           class="
-            mx-auto mt-3 max-w-75 text-[clamp(1.75rem,4vw,2.65rem)] leading-[1.2]
+            mx-auto mt-2 max-w-75 text-2xl leading-[1.2]
             font-medium tracking-[-0.055em]
-            sm:max-w-none
+            sm:mt-3 sm:max-w-none sm:text-[clamp(1.75rem,4vw,2.65rem)]
           "
         >
           {{ $t('study.title') }} <span class="text-primary">{{ $t('study.titleAccent') }}</span>
         </h1>
-        <p class="mt-3 text-xs text-muted sm:text-sm">{{ $t('study.subtitle') }}</p>
+        <p class="mt-1.5 text-xs text-muted sm:mt-3 sm:text-sm">{{ $t('study.subtitle') }}</p>
       </section>
       <ModeSelector :mode="store.saved.mode" @change="store.setMode" />
       <div
         class="
-          flex flex-col items-start gap-6 pt-6
+          flex flex-col items-start gap-6 pt-4
           pb-12
           sm:gap-8 sm:pt-10
           laptop:mx-auto laptop:grid laptop:w-full laptop:max-w-228 laptop:grid-cols-[minmax(240px,360px)_minmax(400px,520px)]
@@ -190,7 +190,14 @@ async function undo() {
           "
           :aria-label="$t('study.practice')"
         >
-          <div class="mb-4 flex justify-between text-[0.7rem] text-muted"><span>{{ $t(session.extra ? 'study.extraPractice' : 'study.dailySession') }}</span><span>{{ $t('study.remaining', { count: session.queue.length }) }}</span></div>
+          <div
+            class="
+              mb-3 flex justify-between text-[0.7rem] text-muted
+              sm:mb-4
+            "
+          >
+            <span>{{ $t(session.extra ? 'study.extraPractice' : 'study.dailySession') }}</span><span>{{ $t('study.remaining', { count: session.queue.length }) }}</span>
+          </div>
           <Transition
             mode="out-in"
             enter-active-class="transition-opacity duration-150 ease-in motion-reduce:transition-none motion-reduce:duration-0"
