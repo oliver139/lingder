@@ -15,7 +15,7 @@ function selectLocale(code: 'zh-Hant' | 'zh-Hans' | 'en' | 'ja') {
 </script>
 
 <template>
-  <div class="overflow-clip selection:bg-violet-400/40 selection:text-highlighted" :class="getRouteBaseName(route) === 'index' ? 'max-sm:pb-[calc(4rem+env(safe-area-inset-bottom))]' : undefined">
+  <div class="overflow-clip selection:bg-violet-400/40 selection:text-highlighted">
     <div
       class="
         mx-auto max-w-[1260px] px-5
