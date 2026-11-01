@@ -52,7 +52,7 @@
     "review": "稍後複習",
     "mastered": "已熟記",
     "undo": "復原上一次評定",
-    "gestureHint": "← → 稍後複習 · ↑ ↓ 已熟記",
+    "gestureHint": "向左或向右滑動，稍後複習。向上或向下滑動，標記為已熟記。",
     "keyboardHint": "點選字卡後，即可使用方向鍵。",
     "keyboardRevealHint": "按空白鍵或 Enter 顯示讀音。",
     "settings": "調整學習方式",

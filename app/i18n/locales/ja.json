@@ -52,7 +52,7 @@
     "review": "あとで復習",
     "mastered": "覚えた",
     "undo": "前の回答を取り消す",
-    "gestureHint": "← → あとで復習 · ↑ ↓ 覚えた",
+    "gestureHint": "左右にスワイプするとあとで復習、上下にスワイプすると覚えたものとして記録します。",
     "keyboardHint": "カードをクリックすると、矢印キーで操作できます。",
     "keyboardRevealHint": "スペースキー / Enter キーで読み方を表示。",
     "settings": "自分に合った学び方に",

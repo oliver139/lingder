@@ -228,7 +228,33 @@ async function undo() {
               <StudyComplete v-else :exhausted="exhausted" :extra="session.extra" @practice="store.startExtra" />
             </div>
           </Transition>
-          <p id="card-help" class="mt-14 mb-6 text-center text-xs text-muted">{{ $t('study.gestureHint') }}</p>
+          <p
+            id="card-help"
+            class="
+              fixed inset-x-0 bottom-0 z-20 flex
+              flex-wrap items-center justify-center gap-x-4 gap-y-1
+              border-t border-default bg-default/95 px-4 pt-3
+              pb-[calc(0.75rem+env(safe-area-inset-bottom))] text-center text-xs text-muted backdrop-blur-sm
+              sm:static sm:mt-14 sm:mb-6 sm:border-0 sm:bg-transparent
+              sm:p-0 sm:backdrop-blur-none
+            "
+          >
+            <span class="sr-only">{{ $t('study.gestureHint') }}</span>
+            <span class="inline-flex items-center gap-1.5" aria-hidden="true">
+              <span class="inline-flex gap-0.5">
+                <UIcon name="i-lucide-arrow-left" class="size-4" />
+                <UIcon name="i-lucide-arrow-right" class="size-4" />
+              </span>
+              {{ $t('study.review') }}
+            </span>
+            <span class="inline-flex items-center gap-1.5" aria-hidden="true">
+              <span class="inline-flex gap-0.5">
+                <UIcon name="i-lucide-arrow-up" class="size-4" />
+                <UIcon name="i-lucide-arrow-down" class="size-4" />
+              </span>
+              {{ $t('study.mastered') }}
+            </span>
+          </p>
           <RatingControls :disabled="!store.current || animating || switchingMode" :can-undo="canUndo && !animating && !switchingMode" @rate="rateCurrent" @undo="undo" />
           <p class="mt-4 text-center text-[0.65rem] leading-[1.7] text-muted">{{ $t('study.keyboardHint') }} <span v-if="store.progress.settings.reading === 'reveal'">{{ $t('study.keyboardRevealHint') }}</span></p>
           <p class="sr-only" role="status" aria-live="polite" aria-atomic="true">{{ announcement }} {{ $t('study.progressAnnouncement', { count: store.dailyCount, goal: store.progress.settings.goal, percent: dailyPercent }) }}</p>
