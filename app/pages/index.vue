@@ -207,7 +207,7 @@ async function undo() {
               switchingMode = false; element.removeAttribute('inert')
             }"
           >
-            <div :key="store.saved.mode" class="px-4">
+            <div :key="store.saved.mode" class="px-8 sm:px-4">
               <StudyCard
                 v-if="store.current"
                 ref="cardStack"
