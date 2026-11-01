@@ -5,7 +5,11 @@ const routeBaseName = useRouteBaseName()
 const site = useSiteConfig()
 const config = useRuntimeConfig()
 const page = computed(() => routeBaseName(route) === 'table' ? 'table' : 'cards')
-const title = computed(() => `${t(`seo.${page.value}.title`)} | ${site.name}`)
+const title = computed(() => [
+  ...(page.value === 'table' ? [t('seo.table.title')] : []),
+  site.name,
+  t('seo.cards.title'),
+].join(' | '))
 const description = computed(() => config.public.siteDescription || t(`seo.${page.value}.description`))
 const image = computed(() => new URL(config.public.siteImage || `/og/${locale.value}.jpg`, site.url).href)
 
