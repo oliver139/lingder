@@ -16,7 +16,8 @@
       "cards": "カード",
       "table": "発音表"
     },
-    "language": "表示言語"
+    "language": "表示言語",
+    "github": "GitHub でソースコードを見る"
   },
   "study": {
     "brand": "Lingder",

@@ -32,7 +32,12 @@ function selectLocale(code: 'zh-Hant' | 'zh-Hans' | 'en' | 'ja') {
           static h-auto shrink-0 border-0 bg-transparent
           backdrop-blur-none
         "
-        :ui="{ container: 'flex min-h-18 items-center justify-between border-b border-default sm:min-h-24 h-auto px-0 sm:px-0 lg:px-0', left: 'lg:flex-none', right: 'lg:flex-none' }"
+        :ui="{
+          container: 'grid grid-cols-[1fr_auto] items-center gap-y-0 border-b border-default h-auto px-0 sm:flex sm:px-0 lg:px-0',
+          left: 'min-h-18 sm:min-h-24 lg:flex-none',
+          center: 'flex col-span-2 row-start-2 justify-center border-t border-default sm:ml-auto sm:border-0',
+          right: 'col-start-2 row-start-1 lg:flex-none',
+        }"
       >
         <template #left>
           <NuxtLinkLocale
@@ -46,36 +51,43 @@ function selectLocale(code: 'zh-Hant' | 'zh-Hans' | 'en' | 'ja') {
             <span class="mr-2.5 text-2xl text-primary" aria-hidden="true">✦</span>{{ $t('study.brand') }}<span class="text-primary">.</span>
           </NuxtLinkLocale>
         </template>
+        <nav
+          class="flex items-center gap-2 text-sm font-medium"
+          :aria-label="$t('app.navigation.label')"
+        >
+          <NuxtLinkLocale
+            v-for="link in [{ path: '/', name: 'index', label: 'cards' }, { path: '/table', name: 'table', label: 'table' }]"
+            :key="link.name"
+            v-slot="{ href, navigate }"
+            :to="link.path"
+            custom
+          >
+            <a
+              :href="href"
+              class="
+                flex min-h-11 items-center rounded-lg px-2
+                text-muted
+                hover:text-highlighted
+                aria-[current=page]:text-primary
+                sm:px-3
+              "
+              :aria-current="getRouteBaseName(route) === link.name ? 'page' : undefined"
+              @click="navigate"
+            >{{ $t(`app.navigation.${link.label}`) }}</a>
+          </NuxtLinkLocale>
+        </nav>
         <template #right>
           <div class="flex items-center gap-1 sm:gap-4">
-            <nav
-              class="
-                flex items-center gap-1 text-xs font-medium
-                sm:text-sm
-              "
-              :aria-label="$t('app.navigation.label')"
-            >
-              <NuxtLinkLocale
-                v-for="link in [{ path: '/', name: 'index', label: 'cards' }, { path: '/table', name: 'table', label: 'table' }]"
-                :key="link.name"
-                v-slot="{ href, navigate }"
-                :to="link.path"
-                custom
-              >
-                <a
-                  :href="href"
-                  class="
-                    flex min-h-11 items-center rounded-lg px-2
-                    text-muted
-                    hover:text-highlighted
-                    aria-[current=page]:text-primary
-                    sm:px-3
-                  "
-                  :aria-current="getRouteBaseName(route) === link.name ? 'page' : undefined"
-                  @click="navigate"
-                >{{ $t(`app.navigation.${link.label}`) }}</a>
-              </NuxtLinkLocale>
-            </nav>
+            <UButton
+              to="https://github.com/oliver139/lingder"
+              target="_blank"
+              rel="noopener noreferrer"
+              icon="i-ri-github-fill"
+              color="primary"
+              variant="ghost"
+              class="size-10 justify-center p-0"
+              :aria-label="$t('app.github')"
+            />
             <USelect
               :model-value="locale"
               :items="locales"
