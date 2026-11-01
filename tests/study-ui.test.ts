@@ -71,7 +71,7 @@ describe('study screen integration', () => {
     const first = store.current!.id
     await wrapper.findAll('button').find(button => button.text() === 'Mastered')!.trigger('click')
     expect(store.progress.mastered).toEqual([first])
-    await wrapper.findAll('button').find(button => button.text() === 'Undo last rating')!.trigger('click')
+    await wrapper.findAll('button').find(button => button.text() === 'Back to previous')!.trigger('click')
     expect(store.current!.id).toBe(first)
     await wrapper.findAll('button').find(button => button.text() === 'Mastered')!.trigger('click')
     await wrapper.findAll('button').find(button => button.text() === 'Restore')!.trigger('click')
@@ -88,7 +88,7 @@ describe('study screen integration', () => {
     const store = useStudyStore()
     const ids = store.progress.session.queue.slice(0, 3)
     const rate = wrapper.findAll('button').find(button => button.text() === 'Mastered')!
-    const undo = wrapper.findAll('button').find(button => button.text() === 'Undo last rating')!
+    const undo = wrapper.findAll('button').find(button => button.text() === 'Back to previous')!
     for (let index = 0; index < 3; index++) {
       await rate.trigger('click')
     }
