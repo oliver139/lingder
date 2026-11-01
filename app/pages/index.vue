@@ -239,9 +239,10 @@ async function undo() {
           <p
             id="card-help"
             class="
-              mt-14 mb-6 flex flex-wrap items-center
+              mt-11 mb-6 flex flex-wrap items-center
               justify-center gap-x-4 gap-y-1 text-center text-xs
               text-muted
+              sm:mt-10
             "
           >
             <span class="sr-only">{{ $t('study.gestureHint') }}</span>
