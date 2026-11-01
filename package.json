@@ -1,7 +1,7 @@
 {
   "name": "lingder",
   "type": "module",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "private": true,
   "packageManager": "pnpm@12.16.1",
   "author": "Oliver Mak <oliver139.working@gmail.com> (https://github.com/oliver139)",
