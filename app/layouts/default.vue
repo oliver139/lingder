@@ -18,14 +18,22 @@ function selectLocale(code: 'zh-Hant' | 'zh-Hans' | 'en' | 'ja') {
   <div class="overflow-clip selection:bg-violet-400/40 selection:text-highlighted">
     <div
       class="
-        mx-auto max-w-[1260px] px-5
+        mx-auto flex min-h-dvh w-full max-w-[1260px]
+        flex-col px-5
         **:focus-visible:outline-3 **:focus-visible:outline-offset-4 **:focus-visible:outline-primary
         motion-reduce:**:animate-none motion-reduce:**:transition-none
         sm:px-8
         desktop:px-12
       "
     >
-      <UHeader :toggle="false" class="static h-auto border-0 bg-transparent backdrop-blur-none" :ui="{ container: 'flex min-h-18 items-center justify-between border-b border-default sm:min-h-24 h-auto px-0 sm:px-0 lg:px-0', left: 'lg:flex-none', right: 'lg:flex-none' }">
+      <UHeader
+        :toggle="false"
+        class="
+          static h-auto shrink-0 border-0 bg-transparent
+          backdrop-blur-none
+        "
+        :ui="{ container: 'flex min-h-18 items-center justify-between border-b border-default sm:min-h-24 h-auto px-0 sm:px-0 lg:px-0', left: 'lg:flex-none', right: 'lg:flex-none' }"
+      >
         <template #left>
           <NuxtLinkLocale
             class="
@@ -91,10 +99,10 @@ function selectLocale(code: 'zh-Hant' | 'zh-Hans' | 'en' | 'ja') {
           </div>
         </template>
       </UHeader>
-      <UMain class="min-h-0">
+      <UMain class="min-h-0 flex-1">
         <slot />
       </UMain>
-      <UFooter :ui="{ container: 'flex justify-between gap-4 border-t border-default py-6 text-[0.65rem] text-muted max-sm:flex-col max-sm:gap-2 px-0 sm:px-0 lg:px-0', left: 'order-1 mt-0 justify-start lg:flex-none', center: 'hidden', right: 'order-3 justify-start lg:flex-none' }">
+      <UFooter class="shrink-0" :ui="{ container: 'flex justify-between gap-4 border-t border-default py-6 text-[0.65rem] text-muted max-sm:flex-col max-sm:gap-2 px-0 sm:px-0 lg:px-0', left: 'order-1 mt-0 justify-start lg:flex-none', center: 'hidden', right: 'order-3 justify-start lg:flex-none' }">
         <template #left><div class="flex flex-wrap items-center gap-2"><span>{{ $t('study.footer') }}</span>•<AudioCredits /></div></template>
         <template #right><span>{{ $t('study.localOnly') }}</span></template>
       </UFooter>
