@@ -5,19 +5,24 @@ export function useStudyPersistence() {
   const storageWarning = shallowRef<'unavailable' | 'invalid' | null>(null)
 
   onMounted(() => {
-    let recovered = null
-    try {
-      const raw = window.localStorage.getItem(STUDY_STORAGE_KEY)
-      if (raw !== null) {
-        recovered = decodeStudy(raw)
-        if (!recovered) {
-          storageWarning.value = 'invalid'
+    if (!store.ready) {
+      let recovered = null
+      try {
+        const raw = window.localStorage.getItem(STUDY_STORAGE_KEY)
+        if (raw !== null) {
+          recovered = decodeStudy(raw)
+          if (!recovered) {
+            storageWarning.value = 'invalid'
+          }
         }
+      } catch {
+        storageWarning.value = 'unavailable'
       }
-    } catch {
-      storageWarning.value = 'unavailable'
+      store.initialize(recovered)
+    } else {
+      // Cards and Table share one live session; navigating between them must not reset Undo.
+      store.refreshDay()
     }
-    store.initialize(recovered)
     watch(() => store.saved, (value) => {
       try {
         window.localStorage.setItem(STUDY_STORAGE_KEY, JSON.stringify(value))

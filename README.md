@@ -16,6 +16,8 @@ Built with Nuxt 4, Vue 3, TypeScript, Nuxt UI, Tailwind CSS, and Pinia.
 
 The interface supports Traditional Chinese (default), Simplified Chinese, English, and Japanese. The homepage (`/`) restores your last chosen locale, defaulting to Traditional Chinese. Explicit `/zh-Hant/`, `/zh-Hans/`, `/en/`, and `/ja/` URLs take precedence and remember that language for your next visit. Browser language does not override this choice. The interface language and the language you study are independent.
 
+Cards and the Pronunciation Table share one remembered study language. Share a specific choice with `?mode=ja` (Japanese) or `?mode=tw` (Zhuyin) on either page: `/en/?mode=tw` opens Zhuyin cards with English interface text, and `/en/table/?mode=ja` opens the Japanese table. The language switch updates the query parameter and saved choice. A valid parameter overrides the remembered mode without resetting progress; missing, invalid, or repeated parameters keep the saved choice, defaulting to Japanese for a new visitor.
+
 Swipe left/right for **Review later** and up/down for **Mastered**. When the card is focused, arrow keys do the same; Space or Enter reveals a hidden reading.
 
 ## Local setup

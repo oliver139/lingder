@@ -1,11 +1,16 @@
 import { flushPromises, mount } from '@vue/test-utils'
+import { createPinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { defineComponent } from 'vue'
+import { defineComponent, nextTick } from 'vue'
 import ModeSelector from '@/components/study/ModeSelector.vue'
 import { usePronunciationAudio } from '@/composables/usePronunciationAudio'
+import { useStudyModeQuery } from '@/composables/useStudyModeQuery'
+import { useStudyPersistence } from '@/composables/useStudyPersistence'
 import { pronunciationByCard } from '@/data/audio'
 import { studyDecks } from '@/data/decks'
 import TestPage from '@/pages/table.vue'
+import { useStudyStore } from '@/stores/study'
+import { decodeStudy, STUDY_STORAGE_KEY } from '@/utils/study/persistence'
 
 const originalAudio = globalThis.Audio
 class FakeAudio extends EventTarget {
@@ -24,9 +29,16 @@ class FakeAudio extends EventTarget {
 }
 
 beforeEach(() => {
+  setActivePinia(createPinia())
+  localStorage.clear()
   FakeAudio.instances = []
   vi.stubGlobal('Audio', FakeAudio)
   vi.stubGlobal('usePronunciationAudio', usePronunciationAudio)
+  vi.stubGlobal('useStudyModeQuery', useStudyModeQuery)
+  vi.stubGlobal('useStudyStore', useStudyStore)
+  vi.stubGlobal('useStudyPersistence', useStudyPersistence)
+  vi.stubGlobal('useRoute', () => ({ path: '/en/table/', query: {}, hash: '' }))
+  vi.stubGlobal('useRouter', () => ({ replace: vi.fn() }))
 })
 afterEach(() => vi.stubGlobal('Audio', originalAudio))
 
@@ -41,6 +53,36 @@ function render() {
 }
 
 describe('pronunciation test page', () => {
+  it('uses the Cards preference when no mode is provided and remembers table switch changes', async () => {
+    const store = useStudyStore()
+    store.initialize(null)
+    store.setMode('tw')
+    localStorage.setItem(STUDY_STORAGE_KEY, JSON.stringify(store.saved))
+    setActivePinia(createPinia())
+    const wrapper = render()
+    await nextTick()
+    expect(wrapper.findAll('[data-card-id]')).toHaveLength(37)
+    await wrapper.getComponent(ModeSelector).findAll('button')[0]!.trigger('click')
+    expect(wrapper.findAll('[data-card-id]')).toHaveLength(96)
+    expect(decodeStudy(localStorage.getItem(STUDY_STORAGE_KEY)!)?.mode).toBe('ja')
+  })
+
+  it('remembers the requested language without loading audio or resetting card progress', async () => {
+    vi.stubGlobal('useRoute', () => ({ path: '/en/table/', query: { mode: 'tw' }, hash: '' }))
+    const store = useStudyStore()
+    store.initialize(null)
+    store.rate(store.current!.id, 'mastered')
+    const before = JSON.parse(JSON.stringify(store.saved.modes))
+    const wrapper = render()
+    await nextTick()
+    expect(wrapper.findAll('[data-card-id]')).toHaveLength(37)
+    expect(wrapper.get('[data-card-id="tw-zhuyin-3105"]').text()).toContain('ㄅ')
+    expect(FakeAudio.instances).toHaveLength(0)
+    const saved = decodeStudy(localStorage.getItem(STUDY_STORAGE_KEY)!)!
+    expect(saved.mode).toBe('tw')
+    expect(saved.modes).toEqual(before)
+  })
+
   it('separates languages and groups all kana into expanded rows without loading audio', async () => {
     const wrapper = render()
     expect(wrapper.findAll('section')).toHaveLength(2)

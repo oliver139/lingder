@@ -5,6 +5,7 @@ import { eligibleIds } from '../utils/study/session'
 
 const store = useStudyStore()
 const { storageWarning } = useStudyPersistence()
+const { selectMode } = useStudyModeQuery(store.setMode)
 const { t } = useI18n()
 const announcement = shallowRef('')
 const cardStack = useTemplateRef('cardStack')
@@ -147,7 +148,7 @@ async function undo() {
     </div>
     <template v-else>
       <p v-if="storageWarning" class="mt-4 rounded-[0.7rem] bg-elevated p-4 text-sm" role="alert">{{ $t(`study.storage.${storageWarning}`) }}</p>
-      <ModeSelector :mode="store.saved.mode" @change="store.setMode" />
+      <ModeSelector :mode="store.saved.mode" @change="selectMode" />
       <div
         class="
           flex flex-col items-start gap-6 pt-4

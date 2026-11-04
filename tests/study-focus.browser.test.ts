@@ -11,6 +11,7 @@ import StudyComplete from '@/components/study/StudyComplete.vue'
 import StudySettings from '@/components/study/StudySettings.vue'
 import { useCardGesture } from '@/composables/useCardGesture'
 import { usePronunciationAudio } from '@/composables/usePronunciationAudio'
+import { useStudyModeQuery } from '@/composables/useStudyModeQuery'
 import { useStudyPersistence } from '@/composables/useStudyPersistence'
 import { studyDecks } from '@/data/decks'
 import en from '@/i18n/locales/en.json'
@@ -32,6 +33,9 @@ beforeEach(() => {
   localStorage.clear()
   vi.stubGlobal('useStudyStore', useStudyStore)
   vi.stubGlobal('useStudyPersistence', useStudyPersistence)
+  vi.stubGlobal('useStudyModeQuery', useStudyModeQuery)
+  vi.stubGlobal('useRoute', () => ({ path: '/en/', query: {}, hash: '' }))
+  vi.stubGlobal('useRouter', () => ({ replace: vi.fn() }))
   vi.stubGlobal('useCardGesture', useCardGesture)
   vi.stubGlobal('usePronunciationAudio', usePronunciationAudio)
   vi.stubGlobal('useI18n', () => ({ t }))
@@ -89,6 +93,14 @@ it.each(['{Enter}', ' '])('focuses the initial card, then Extra practice, and st
 it('focuses Extra practice when reopening a completed daily session', async () => {
   await setup(true)
   await expect.element(page.getByRole('button', { name: 'Extra practice', exact: true })).toHaveFocus()
+})
+
+it('focuses the requested Zhuyin card after overriding saved Japanese mode', async () => {
+  vi.stubGlobal('useRoute', () => ({ path: '/en/', query: { mode: 'tw' }, hash: '' }))
+  const store = await setup()
+  expect(store.saved.mode).toBe('tw')
+  await expect.element(page.getByRole('button', { name: /card: / })).toHaveFocus()
+  await expect.element(page.getByRole('button', { name: /Taiwan Zhuyin/, pressed: true })).toBeVisible()
 })
 
 it('focuses the completion message when every card is mastered', async () => {
