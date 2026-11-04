@@ -195,7 +195,7 @@ async function undo() {
             <p v-if="store.extraCount" class="text-[0.7rem] leading-[1.7] text-muted">{{ $t('study.extraCount', { count: store.extraCount }) }}</p>
           </div>
           <StudySettings :settings="store.progress.settings" :mode="store.saved.mode" @change="store.setSettings" />
-          <MasteredCollection :mode="store.saved.mode" :mastered="store.progress.mastered" @restore="store.restore" />
+          <MasteredCollection :mode="store.saved.mode" :mastered="store.progress.mastered" @restore="store.restore" @restore-all="store.restoreAll" />
         </aside>
         <section
           ref="stage"

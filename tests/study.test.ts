@@ -97,6 +97,31 @@ describe('daily study store', () => {
     expect(store.progress.session.queue).not.toContain(id)
   })
 
+  it('restores all mastery in the active language while retaining today’s progress and queue', () => {
+    const store = initialized()
+    for (let i = 0; i < 3; i++) store.rate(store.current!.id, 'mastered')
+    store.saved.modes.tw.mastered = ['tw-3105']
+    const otherLanguage = JSON.parse(JSON.stringify(store.saved.modes.tw))
+    const session = JSON.parse(JSON.stringify(store.progress.session))
+    expect(store.undoHistory.length).toBeGreaterThan(0)
+    store.restoreAll()
+    expect(store.progress.mastered).toEqual([])
+    expect(store.progress.session).toEqual(session)
+    expect(store.saved.modes.tw).toEqual(otherLanguage)
+    expect(store.undoHistory).toEqual([])
+  })
+
+  it('makes a fully mastered language available for practice again', () => {
+    const saved = initialStudy()
+    saved.modes.ja.mastered = eligibleIds('ja', saved.modes.ja)
+    const store = useStudyStore()
+    store.initialize(saved)
+    expect(store.current).toBeNull()
+    store.restoreAll()
+    expect(store.current).not.toBeNull()
+    expect(store.progress.mastered).toEqual([])
+  })
+
   it('undoes multiple mixed ratings in reverse order with their original exits', () => {
     const store = initialized()
     const original = JSON.parse(JSON.stringify(store.progress))

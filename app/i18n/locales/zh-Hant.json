@@ -103,7 +103,9 @@
       "japaneseProcessing": "46 個現代假名 MP3 檔案均原樣使用。歷史假名 wi 與 we 沿用 Wikimedia 的公有領域錄音，並經首尾靜音裁切、音量統一、峰值限制及 MP3 轉換。",
       "zhuyinCredit": "2017 © 教育部，國語注音符號手冊-開放部件。",
       "zhuyinLicense": "此素材依「創用CC 姓名標示 4.0 國際版本」授權條款進行公眾釋出，使用者於遵守本條款各項規定之前提下，得利用之。"
-    }
+    },
+    "clearMastered": "清空已熟記的字卡",
+    "confirmClearMastered": "確認全部移除？"
   },
   "audioTest": {
     "title": "發音表",

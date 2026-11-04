@@ -121,6 +121,13 @@ export const useStudyStore = defineStore('study', () => {
     undoHistory.value = []
   }
 
+  function restoreAll() {
+    refreshDay()
+    progress.value.mastered = []
+    progress.value.session = reconcileSession(saved.value.mode, progress.value, localDay())
+    undoHistory.value = []
+  }
+
   function startExtra() {
     refreshDay()
     if (progress.value.session.queue.length) {
@@ -132,5 +139,5 @@ export const useStudyStore = defineStore('study', () => {
     undoHistory.value = []
   }
 
-  return { saved, ready, undoHistory, lastRating, progress, studiedCount, dailyCount, extraCount, current, initialize, refreshDay, setMode, setSettings, rate, undo, restore, startExtra }
+  return { saved, ready, undoHistory, lastRating, progress, studiedCount, dailyCount, extraCount, current, initialize, refreshDay, setMode, setSettings, rate, undo, restore, restoreAll, startExtra }
 })

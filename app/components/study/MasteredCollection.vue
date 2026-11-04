@@ -3,13 +3,39 @@ import type { StudyMode } from '../../types/study'
 import { studyDecks } from '../../data/decks'
 
 const props = defineProps<{ mode: StudyMode, mastered: string[] }>()
-const emit = defineEmits<{ restore: [id: string] }>()
+const emit = defineEmits<{ restore: [id: string], restoreAll: [] }>()
+const summary = useTemplateRef<HTMLElement>('summary')
+const confirming = shallowRef(false)
+let confirmationExpiresAt = 0
+const { start, stop } = useTimeoutFn(resetConfirmation, 3000, { immediate: false })
+
+function resetConfirmation() {
+  confirming.value = false
+  confirmationExpiresAt = 0
+  stop()
+}
+
+function clearMastered() {
+  if (!props.mastered.length) return
+  if (confirming.value && Date.now() < confirmationExpiresAt) {
+    resetConfirmation()
+    summary.value?.focus({ preventScroll: true })
+    emit('restoreAll')
+    return
+  }
+  confirming.value = true
+  confirmationExpiresAt = Date.now() + 3000
+  start()
+}
+
+watch(() => [props.mode, ...props.mastered], resetConfirmation)
 const cards = computed(() => studyDecks.filter(deck => deck.mode === props.mode).flatMap(deck => deck.cards.filter(card => props.mastered.includes(card.id)).map(card => ({ ...card, deck }))))
 </script>
 
 <template>
-  <details class="rounded-[1rem] border border-default bg-card">
+  <details class="rounded-[1rem] border border-default bg-card" @toggle="!($event.target as HTMLDetailsElement).open && resetConfirmation()">
     <summary
+      ref="summary"
       class="
         min-h-14 cursor-pointer rounded-[1rem] p-5 text-sm
         font-medium
@@ -19,12 +45,24 @@ const cards = computed(() => studyDecks.filter(deck => deck.mode === props.mode)
     </summary>
     <div class="px-5 pb-5">
       <p class="mb-3 text-[0.7rem] leading-[1.7] text-muted">{{ $t('study.collectionHint') }}</p>
+      <UButton
+        v-if="cards.length"
+        type="button"
+        :icon="confirming ? 'i-lucide-circle-alert' : undefined"
+        :color="confirming ? 'error' : 'neutral'"
+        :variant="confirming ? 'solid' : 'outline'"
+        class="mb-3 min-h-11 w-full justify-center"
+        @keydown="($event.repeat || $event.isComposing) && $event.preventDefault()"
+        @click="clearMastered"
+      >
+        <span aria-live="polite">{{ $t(confirming ? 'study.confirmClearMastered' : 'study.clearMastered') }}</span>
+      </UButton>
       <p v-if="!cards.length" class="text-[0.7rem] leading-[1.7] text-muted">{{ $t('study.collectionEmpty') }}</p>
       <ul
         v-else
         class="
           grid max-h-90 scrollbar-none grid-cols-[repeat(auto-fill,minmax(min(100%,5rem),1fr))] gap-2
-          overflow-y-auto p-1
+          overflow-y-auto
           [&::-webkit-scrollbar]:hidden
         "
       >

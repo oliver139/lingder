@@ -103,7 +103,9 @@
       "japaneseProcessing": "The 46 modern kana MP3s are used unchanged. Historical wi and we retain their public-domain Wikimedia recordings, with silence trimming, volume normalization, peak limiting, and MP3 conversion.",
       "zhuyinCredit": "2017 © Ministry of Education, Taiwan. Mandarin Phonetic Symbols Handbook — Open Components.",
       "zhuyinLicense": "This material is made publicly available under the Creative Commons Attribution 4.0 International license. You may use it provided that you comply with all terms of the license."
-    }
+    },
+    "clearMastered": "Clear mastered cards",
+    "confirmClearMastered": "Confirm removing all?"
   },
   "audioTest": {
     "title": "Pronunciation Table",
