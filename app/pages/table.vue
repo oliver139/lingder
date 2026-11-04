@@ -4,7 +4,7 @@ import { studyDecks } from '../data/decks'
 
 const store = useStudyStore()
 const { storageWarning } = useStudyPersistence()
-const { selectMode } = useStudyModeQuery(store.setMode)
+useStudyModeQuery(store.setMode)
 const { play, stop, loading, playing, error } = usePronunciationAudio()
 const selectedId = shallowRef<string>()
 const mode = computed(() => store.saved.mode)
@@ -42,7 +42,7 @@ watch(mode, () => {
       <p class="text-sm text-muted">{{ $t('audioTest.description') }}</p>
     </header>
     <p v-if="storageWarning" class="rounded-[0.7rem] bg-elevated p-4 text-sm" role="alert">{{ $t(`study.storage.${storageWarning}`) }}</p>
-    <ModeSelector :mode="mode" @change="selectMode" />
+    <ModeSelector :mode="mode" @change="store.setMode" />
     <section v-for="deck in visibleDecks" :key="deck.id" class="space-y-4" :aria-labelledby="`heading-${deck.id}`">
       <h2 :id="`heading-${deck.id}`" class="text-xl font-medium text-highlighted">{{ $t(deck.labelKey) }} <span class="text-sm text-muted">({{ deck.cards.length }})</span></h2>
       <div v-for="group in deck.groups" :key="group.id" class="space-y-3" :data-kana-row="deck.mode === 'ja' ? group.id : undefined">

@@ -7,16 +7,13 @@ export function useStudyModeQuery(applyMode: (mode: StudyMode) => void) {
   // Run after mounted persistence has restored the cards, and keep SSG hydration stable.
   onMounted(() => {
     watch(() => route.query.mode, (value) => {
-      if (value === 'ja' || value === 'tw') {
-        applyMode(value)
+      const mode = value === 'jp' ? 'ja' : value
+      if (mode === 'ja' || mode === 'tw') {
+        applyMode(mode)
+        const query = { ...route.query }
+        delete query.mode
+        return router.replace({ path: route.path, query, hash: route.hash })
       }
     }, { immediate: true })
   })
-
-  function selectMode(mode: StudyMode) {
-    applyMode(mode)
-    return router.replace({ path: route.path, query: { ...route.query, mode }, hash: route.hash })
-  }
-
-  return { selectMode }
 }
