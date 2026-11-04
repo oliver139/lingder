@@ -71,6 +71,34 @@ it('supports focus, Space/Enter reveal, arrow keys and prevents held-key duplica
   await expect.poll(() => rate.mock.calls.map(call => call.slice(0, 2))).toEqual([['ja-hiragana-a', 'review']])
 })
 
+it('shows the card ring only for Tab navigation and hides it when rating with arrows', async () => {
+  const { card, screen } = await setup()
+  const element = card.element() as HTMLElement
+  element.focus()
+  await expect.element(card).toHaveAttribute('data-keyboard-focus', 'false')
+  await userEvent.keyboard(' ')
+  await userEvent.tab()
+  await userEvent.tab({ shift: true })
+  await expect.element(card).toHaveFocus()
+  await expect.element(card).toHaveAttribute('data-keyboard-focus', 'true')
+  await userEvent.keyboard(' ')
+  await expect.element(card).toHaveAttribute('data-keyboard-focus', 'true')
+  await userEvent.keyboard('{ArrowRight}')
+  await expect.element(card).toHaveAttribute('data-keyboard-focus', 'false')
+
+  await screen.rerender({ card: studyDecks[0]!.cards[1]! })
+  await expect.element(card).toHaveFocus()
+  await expect.element(card).toHaveAttribute('data-keyboard-focus', 'false')
+  // Reveal the speaker so Tab can leave the card and Shift+Tab can return to it.
+  await userEvent.keyboard(' ')
+  await userEvent.tab()
+  await userEvent.tab({ shift: true })
+  await expect.element(card).toHaveFocus()
+  await expect.element(card).toHaveAttribute('data-keyboard-focus', 'true')
+  await card.click()
+  await expect.element(card).toHaveAttribute('data-keyboard-focus', 'false')
+})
+
 it('reveals with a real pointer click and resets reading for the next card', async () => {
   const { card, screen } = await setup()
   await card.click()

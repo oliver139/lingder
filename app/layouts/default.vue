@@ -20,10 +20,10 @@ function selectLocale(code: 'zh-Hant' | 'zh-Hans' | 'en' | 'ja') {
       class="
         mx-auto flex min-h-dvh w-full max-w-[1260px]
         flex-col px-5
-        **:focus-visible:outline-3 **:focus-visible:outline-offset-4 **:focus-visible:outline-primary
         motion-reduce:**:animate-none motion-reduce:**:transition-none
         sm:px-8
         desktop:px-12
+        [&_:focus-visible:not(.study-card)]:outline-3 [&_:focus-visible:not(.study-card)]:outline-offset-4 [&_:focus-visible:not(.study-card)]:outline-primary
       "
     >
       <UHeader

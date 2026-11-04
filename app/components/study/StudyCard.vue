@@ -14,6 +14,20 @@ const surface = shallowRef<HTMLElement | null>(null)
 let animation: Animation | undefined
 const revealed = shallowRef(false)
 const committed = shallowRef(false)
+const keyboardFocus = shallowRef(false)
+let tabPending = false
+
+// Track Tab navigation explicitly: browsers can also mark programmatic focus as focus-visible.
+useEventListener('keydown', (event: KeyboardEvent) => {
+  tabPending = event.key === 'Tab'
+}, { capture: true })
+useEventListener('keyup', (event: KeyboardEvent) => {
+  if (event.key === 'Tab') tabPending = false
+}, { capture: true })
+useEventListener('pointerdown', () => {
+  tabPending = false
+  keyboardFocus.value = false
+}, { capture: true })
 const pronunciation = usePronunciationAudio()
 const recording = computed(() => pronunciationByCard[props.card.id])
 onMounted(() => {
@@ -135,6 +149,7 @@ watch(() => props.card.id, async (id) => {
   pronunciation.stop()
   if (recording.value) pronunciation.preload(recording.value.src)
   const hadFocus = stack.value?.contains(document.activeElement)
+  keyboardFocus.value = false
   animation?.cancel()
   animation = undefined
   cancel()
@@ -168,6 +183,9 @@ watch(() => props.readingDisplay, () => {
 })
 
 function keydown(event: KeyboardEvent) {
+  if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) {
+    keyboardFocus.value = false
+  }
   if (committed.value || event.repeat || event.altKey || event.ctrlKey || event.metaKey) {
     return
   }
@@ -224,15 +242,19 @@ function keydown(event: KeyboardEvent) {
         <div
           class="
             flex w-full flex-1 flex-col items-center
-            p-6
+            p-6 outline-none
+            data-[keyboard-focus=true]:focus:outline-3 data-[keyboard-focus=true]:focus:outline-offset-4 data-[keyboard-focus=true]:focus:outline-primary data-[keyboard-focus=true]:focus:outline-solid
           "
           :class="index === 0 ? 'study-card' : undefined"
+          :data-keyboard-focus="index === 0 && keyboardFocus"
           data-card-surface
           :role="index === 0 ? 'button' : undefined"
           :tabindex="index === 0 ? 0 : -1"
           :aria-disabled="index === 0 ? committed : undefined"
           :aria-label="$t('study.cardLabel', { script: $t(item.deck.labelKey), prompt: item.prompt })"
           :aria-describedby="index === 0 ? 'card-help card-reading' : undefined"
+          @focus="keyboardFocus = tabPending"
+          @blur="keyboardFocus = false"
           @keydown="keydown"
         >
           <div
