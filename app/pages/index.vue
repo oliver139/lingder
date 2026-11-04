@@ -19,13 +19,22 @@ const exhausted = computed(() => eligibleIds(store.saved.mode, store.progress).l
 const canUndo = computed(() => store.lastRating?.mode === store.saved.mode)
 const dailyPercent = computed(() => store.dailyCount / store.progress.settings.goal * 100)
 
-watch(() => store.current?.id, async (id, previous) => {
-  if (Boolean(id) === Boolean(previous) || !stage.value?.contains(document.activeElement)) {
+watch([() => store.ready, () => store.current?.id], async ([ready, id], [wasReady, previous]) => {
+  if (!ready) {
+    return
+  }
+  const initialLoad = !wasReady
+  const changesScreen = Boolean(id) !== Boolean(previous)
+  if (!initialLoad && (!changesScreen || !stage.value?.contains(document.activeElement))) {
     return
   }
   await nextTick()
-  stage.value?.querySelector<HTMLElement>(id ? '.study-card' : '.completion')?.focus()
-})
+  const target = id
+    ? stage.value?.querySelector<HTMLElement>('.study-card')
+    : stage.value?.querySelector<HTMLElement>('.completion button:not([disabled])')
+      ?? stage.value?.querySelector<HTMLElement>('.completion')
+  target?.focus({ preventScroll: true })
+}, { immediate: true })
 
 function rate(id: string, rating: Rating, exit?: { x: number, y: number }) {
   store.rate(id, rating, exit)

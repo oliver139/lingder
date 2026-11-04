@@ -18,7 +18,15 @@ const emit = defineEmits<{ practice: [] }>()
     <span class="text-5xl text-primary" aria-hidden="true">✦</span>
     <h2 class="text-2xl tracking-[-0.04em]">{{ $t(exhausted ? 'study.exhaustedTitle' : extra ? 'study.extraComplete' : 'study.completeTitle') }}</h2>
     <p class="text-sm leading-[1.7] text-muted">{{ $t(exhausted ? 'study.exhaustedHint' : 'study.completeHint') }}</p>
-    <UButton v-if="!exhausted" size="xl" icon="i-lucide-plus" @click="emit('practice')">{{ $t('study.extraPractice') }}</UButton>
+    <UButton
+      v-if="!exhausted"
+      type="button"
+      size="xl"
+      icon="i-lucide-plus"
+      @click="emit('practice')"
+    >
+      {{ $t('study.extraPractice') }}
+    </UButton>
   </section>
 </template>
 
