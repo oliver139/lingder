@@ -77,7 +77,7 @@ function selectLocale(code: 'zh-Hant' | 'zh-Hans' | 'en' | 'ja') {
           </NuxtLinkLocale>
         </nav>
         <template #right>
-          <div class="flex items-center gap-1 sm:gap-4">
+          <div class="flex items-center gap-1 sm:gap-2">
             <UButton
               to="https://github.com/oliver139/lingder"
               target="_blank"
