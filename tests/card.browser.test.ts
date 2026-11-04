@@ -94,6 +94,28 @@ it.each([
   await expect.element(card).toHaveFocus()
 })
 
+it('keeps focus and swipe controls as the stack shrinks to two cards and then one', async () => {
+  const { screen, card, rate } = await setup()
+  const deck = studyDecks[0]!
+  await screen.rerender({ upcoming: deck.cards.slice(1, 3).map(card => ({ ...card, deck })) })
+  ;(card.element() as HTMLElement).focus()
+
+  for (const index of [1, 2]) {
+    await screen.rerender({
+      card: deck.cards[index]!,
+      upcoming: deck.cards.slice(index + 1, 3).map(card => ({ ...card, deck })),
+    })
+    await expect.element(card).toHaveFocus()
+  }
+
+  const element = card.element().parentElement!
+  vi.spyOn(element, 'setPointerCapture').mockImplementation(() => undefined)
+  pointer(element, 'pointerdown', 150, 150)
+  pointer(element, 'pointermove', 260, 150)
+  pointer(element, 'pointerup', 260, 150)
+  await expect.poll(() => rate.mock.calls.map(call => call.slice(0, 2))).toEqual([[deck.cards[2]!.id, 'review']])
+})
+
 it('ignores secondary pointers, lost capture, held keys and detached elements', async () => {
   const { card, rate, screen } = await setup()
   const element = card.element().parentElement!

@@ -205,7 +205,8 @@ function keydown(event: KeyboardEvent) {
         v-for="(item, index) in cards"
         :key="item.id"
         :ref="element => {
-          if (index === 0) surface = element as HTMLElement | null
+          // A departing card may clear its ref after the next card is promoted.
+          if (index === 0 && element) surface = element as HTMLElement
         }"
         :data-card-id="item.id"
         class="
